@@ -1,0 +1,12 @@
+cat > package.json <<'EOF'
+{
+  "name": "haatly",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Rescuing surplus and imperfect produce from farm to table in Bangladesh.",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  }
+}
+EOF
