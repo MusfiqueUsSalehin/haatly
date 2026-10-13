@@ -1,3 +1,1 @@
-cat > .gitattributes <<'EOF'
 * text=auto eol=lf
-EOF
