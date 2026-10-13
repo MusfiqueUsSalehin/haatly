@@ -1,0 +1,29 @@
+cat > .gitignore <<'EOF'
+# Dependencies
+node_modules/
+
+# Environment and secrets (the .example file IS tracked)
+.env
+.env.*
+!.env.example
+
+# Build output and coverage
+dist/
+build/
+coverage/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Uploads (keep the folder, not the files)
+server/uploads/*
+!server/uploads/.gitkeep
+
+# OS and editor noise
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+EOF
