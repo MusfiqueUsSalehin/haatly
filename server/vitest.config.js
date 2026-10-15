@@ -10,5 +10,7 @@ export default defineConfig({
     // The first integration run downloads a MongoDB binary, so allow extra time.
     testTimeout: 30_000,
     hookTimeout: 120_000,
+    // Files share one database when TEST_MONGODB_URI is set, so run them one at a time.
+    fileParallelism: !process.env.TEST_MONGODB_URI,
   },
 });
