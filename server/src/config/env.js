@@ -7,26 +7,45 @@ export class EnvError extends Error {
   }
 }
 
-const schema = z.object({
-  NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
-  PORT: z.coerce.number().int().min(1).max(65535).default(5000),
-  MONGODB_URI: z
-    .string()
-    .regex(/^mongodb(\+srv)?:\/\/.+/, 'must start with mongodb:// or mongodb+srv://'),
-  CLIENT_ORIGINS: z
-    .string()
-    .default('http://localhost:5173')
-    .transform((value) =>
-      value
-        .split(',')
-        .map((origin) => origin.trim())
-        .filter(Boolean),
-    )
-    .refine((origins) => origins.length > 0 && origins.every((o) => URL.canParse(o)), {
-      message: 'must be a comma-separated list of full URLs, e.g. http://localhost:5173',
-    }),
-  LOG_LEVEL: z.enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace', 'silent']).default('info'),
-});
+// Secrets that look copied from an example file must never reach production.
+const PLACEHOLDER_SECRET = /change[-_]?me|example|dev[-_]?only|your[-_]?secret/i;
+
+const schema = z
+  .object({
+    NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
+    PORT: z.coerce.number().int().min(1).max(65535).default(5000),
+    MONGODB_URI: z
+      .string()
+      .regex(/^mongodb(\+srv)?:\/\/.+/, 'must start with mongodb:// or mongodb+srv://'),
+    CLIENT_ORIGINS: z
+      .string()
+      .default('http://localhost:5173')
+      .transform((value) =>
+        value
+          .split(',')
+          .map((origin) => origin.trim())
+          .filter(Boolean),
+      )
+      .refine((origins) => origins.length > 0 && origins.every((o) => URL.canParse(o)), {
+        message: 'must be a comma-separated list of full URLs, e.g. http://localhost:5173',
+      }),
+    LOG_LEVEL: z
+      .enum(['fatal', 'error', 'warn', 'info', 'debug', 'trace', 'silent'])
+      .default('info'),
+    JWT_SECRET: z.string().min(32, 'must be at least 32 characters'),
+    JWT_EXPIRES_IN: z
+      .string()
+      .regex(/^\d+[smhd]$/, 'must look like 30m, 12h or 7d')
+      .default('7d'),
+    // How many reverse proxies sit in front of the app (0 when running directly).
+    TRUST_PROXY: z.coerce.number().int().min(0).max(5).default(0),
+    // Failed login/register attempts allowed per IP per 15 minutes.
+    AUTH_RATE_LIMIT_MAX: z.coerce.number().int().min(1).default(20),
+  })
+  .refine((env) => !(env.NODE_ENV === 'production' && PLACEHOLDER_SECRET.test(env.JWT_SECRET)), {
+    path: ['JWT_SECRET'],
+    message: 'looks like a placeholder; generate a real secret before running in production',
+  });
 
 /**
  * Validate raw environment variables and return a frozen config object.
