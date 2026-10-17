@@ -15,7 +15,8 @@
     "test:unit": "vitest run tests/unit",
     "test:integration": "vitest run tests/integration",
     "test:watch": "vitest",
-    "admin:create": "node --env-file=.env src/scripts/createAdmin.js"
+    "admin:create": "node --env-file=.env src/scripts/createAdmin.js",
+    "seed:catalog": "node --env-file=.env src/scripts/seedCatalog.js"
   },
   "dependencies": {
     "cors": "^2.8.6",
