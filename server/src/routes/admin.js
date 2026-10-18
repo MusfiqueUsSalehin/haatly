@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { authenticate, requireRole } from '../middleware/auth.js';
+import { createAdminCatalogRouter } from './adminCatalog.js';
 import { validate } from '../middleware/validate.js';
 import {
   createStaffSchema,
@@ -16,6 +17,7 @@ export function createAdminRouter({ tokens }) {
   const router = Router();
 
   router.use(authenticate(tokens), requireRole('admin'));
+  router.use('/produce', createAdminCatalogRouter());
 
   // Filters use exact matches only, so there is no free-text search to inject into.
   router.get('/users', validate(listUsersQuery, 'query'), async (req, res) => {
