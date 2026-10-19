@@ -12,7 +12,8 @@ export function makeTestEnv(overrides = {}) {
   });
 }
 
-export function makeTestApp(overrides = {}) {
+/** Build a test app. Pass { ai } to use your own AI gateway instead of the default. */
+export function makeTestApp(overrides = {}, { ai } = {}) {
   const env = makeTestEnv(overrides);
-  return createApp({ env, logger: createLogger(env) });
+  return createApp({ env, logger: createLogger(env), ai });
 }
