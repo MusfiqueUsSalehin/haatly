@@ -41,10 +41,26 @@ const schema = z
     TRUST_PROXY: z.coerce.number().int().min(0).max(5).default(0),
     // Failed login/register attempts allowed per IP per 15 minutes.
     AUTH_RATE_LIMIT_MAX: z.coerce.number().int().min(1).default(20),
+
+    // AI features always work without a provider (rules only). Set AI_PROVIDER=anthropic
+    // and an API key to let a model improve the answers.
+    AI_PROVIDER: z.enum(['none', 'anthropic']).default('none'),
+    ANTHROPIC_API_KEY: z
+      .string()
+      .optional()
+      .transform((value) => value?.trim() || undefined),
+    AI_MODEL: z.string().trim().min(1).default('claude-haiku-5-5'),
+    AI_TIMEOUT_MS: z.coerce.number().int().min(1000).max(60000).default(15000),
+    // Hard cap on model calls per rolling 24 hours. Past it, the rules answer instead.
+    AI_MAX_CALLS_PER_DAY: z.coerce.number().int().min(0).default(500),
   })
   .refine((env) => !(env.NODE_ENV === 'production' && PLACEHOLDER_SECRET.test(env.JWT_SECRET)), {
     path: ['JWT_SECRET'],
     message: 'looks like a placeholder; generate a real secret before running in production',
+  })
+  .refine((env) => env.AI_PROVIDER !== 'anthropic' || Boolean(env.ANTHROPIC_API_KEY), {
+    path: ['ANTHROPIC_API_KEY'],
+    message: 'is required when AI_PROVIDER is anthropic',
   });
 
 /**
