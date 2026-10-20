@@ -14,7 +14,7 @@ export function createApiRouter({ env, tokens, ai }) {
   router.use('/catalog', createCatalogRouter());
   router.use('/admin', createAdminRouter({ tokens }));
   router.use('/ai', createAiRouter({ tokens, ai }));
-  router.use('/pricing', createPricingRouter());
+  router.use('/pricing', createPricingRouter({ tokens }));
 
   return router;
 }
