@@ -16,4 +16,9 @@ describe('request body limits', () => {
     expect(res.status).toBe(413);
     expect(res.body.error.code).toBe('payload_too_large');
   });
+
+  it('also accepts a large body on the lots routes', async () => {
+    const res = await request(app).post('/api/lots').send(big);
+    expect(res.status).toBe(401);
+  });
 });
