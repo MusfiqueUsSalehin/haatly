@@ -5,6 +5,7 @@ import { createAdminRouter } from './admin.js';
 import { createCatalogRouter } from './catalog.js';
 import { createAiRouter } from './ai.js';
 import { createPricingRouter } from './pricing.js';
+import { createLotsRouter } from './lots.js';
 
 export function createApiRouter({ env, tokens, ai }) {
   const router = Router();
@@ -15,6 +16,7 @@ export function createApiRouter({ env, tokens, ai }) {
   router.use('/admin', createAdminRouter({ tokens }));
   router.use('/ai', createAiRouter({ tokens, ai }));
   router.use('/pricing', createPricingRouter({ tokens }));
+  router.use('/lots', createLotsRouter({ tokens, ai }));
 
   return router;
 }

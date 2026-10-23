@@ -24,7 +24,7 @@ export function createApp({ env, logger, ai = createAiGatewayFromEnv({ env, logg
 
   // Crate photos arrive as base64, so the AI routes get a larger body limit. This parser
   // must come first: it reads those bodies, and the strict global one below then skips them.
-  app.use('/api/ai', express.json({ limit: '2mb' }));
+  app.use(['/api/ai', '/api/lots'], express.json({ limit: '2mb' }));
   app.use(express.json({ limit: '100kb' }));
 
   const tokens = createTokenService(env);
