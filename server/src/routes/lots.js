@@ -7,7 +7,7 @@ import { createLotSchema, listLotsQuery, lotCodeParams } from '../schemas/lots.j
 import { createLot } from '../services/lots/createLot.js';
 import { describeLot } from '../services/lots/describeLot.js';
 import { AppError } from '../utils/AppError.js';
-
+import { withdrawLot } from '../services/lots/withdrawLot.js';
 /** Farmer routes for managing their own lots. */
 export function createLotsRouter({ tokens, ai, perUserPerHour = 60 }) {
   const router = Router();
@@ -53,6 +53,11 @@ export function createLotsRouter({ tokens, ai, perUserPerHour = 60 }) {
   router.get('/:code', validate(lotCodeParams, 'params'), async (req, res) => {
     const lot = await Lot.findOne({ code: req.valid.params.code, farmer: req.user._id });
     if (!lot) throw new AppError(404, 'lot_not_found', 'Lot not found');
+    res.json({ lot: describeLot(lot) });
+  });
+
+  router.post('/:code/withdraw', validate(lotCodeParams, 'params'), async (req, res) => {
+    const lot = await withdrawLot({ farmer: req.user, code: req.valid.params.code });
     res.json({ lot: describeLot(lot) });
   });
 
