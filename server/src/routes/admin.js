@@ -13,11 +13,14 @@ import { USER_STATUS } from '../constants/roles.js';
 import { createUser } from '../services/userService.js';
 import { AppError } from '../utils/AppError.js';
 
+import { createAdminShelfRouter } from './adminShelf.js';
+
 export function createAdminRouter({ tokens }) {
   const router = Router();
 
   router.use(authenticate(tokens), requireRole('admin'));
   router.use('/produce', createAdminCatalogRouter());
+  router.use('/shelf', createAdminShelfRouter());
 
   // Filters use exact matches only, so there is no free-text search to inject into.
   router.get('/users', validate(listUsersQuery, 'query'), async (req, res) => {
