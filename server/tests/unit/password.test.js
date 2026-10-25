@@ -1,7 +1,24 @@
-import { describe, expect, it } from 'vitest';
-import { hashPassword, verifyPassword } from '../../src/utils/password.js';
+import { afterEach, describe, expect, it, vi } from 'vitest';
+import {
+  PRODUCTION_PARAMS,
+  hashPassword,
+  useHashParams,
+  verifyPassword,
+} from '../../src/utils/password.js';
 
 describe('password hashing', () => {
+  afterEach(() => vi.unstubAllEnvs());
+
+  it('keeps the strong production settings', () => {
+    expect(PRODUCTION_PARAMS).toEqual({ N: 2 ** 15, r: 8, p: 3 });
+    expect(Object.isFrozen(PRODUCTION_PARAMS)).toBe(true);
+  });
+
+  it('refuses to weaken hashing outside tests', () => {
+    vi.stubEnv('NODE_ENV', 'production');
+    expect(() => useHashParams({ N: 2, r: 1, p: 1 })).toThrow(/tests only/);
+  });
+
   it('verifies the correct password', async () => {
     const hash = await hashPassword('correct horse battery staple');
     expect(await verifyPassword('correct horse battery staple', hash)).toBe(true);
