@@ -4,10 +4,21 @@ import { promisify } from 'node:util';
 const scrypt = promisify(scryptCallback);
 
 // scrypt at N=2^15, r=8, p=3 is one of OWASP's recommended settings (about 32 MiB per hash).
-const PARAMS = { N: 2 ** 15, r: 8, p: 3 };
+export const PRODUCTION_PARAMS = Object.freeze({ N: 2 ** 15, r: 8, p: 3 });
 const KEY_LENGTH = 32;
 const SALT_LENGTH = 16;
 const MAX_MEMORY = 64 * 1024 * 1024;
+
+let activeParams = PRODUCTION_PARAMS;
+
+/**
+ * Tests only: use cheaper hashing so a big test suite does not run out of memory.
+ * It refuses to run anywhere else, so production can never be weakened by accident.
+ */
+export function useHashParams(next) {
+  if (process.env.NODE_ENV !== 'test') throw new Error('useHashParams is for tests only');
+  activeParams = Object.freeze({ ...next });
+}
 
 /**
  * Hash a password. The result is self-describing, so the cost can be raised later
@@ -15,12 +26,12 @@ const MAX_MEMORY = 64 * 1024 * 1024;
  */
 export async function hashPassword(password) {
   const salt = randomBytes(SALT_LENGTH);
-  const hash = await scrypt(password, salt, KEY_LENGTH, { ...PARAMS, maxmem: MAX_MEMORY });
+  const hash = await scrypt(password, salt, KEY_LENGTH, { ...activeParams, maxmem: MAX_MEMORY });
   return [
     'scrypt',
-    PARAMS.N,
-    PARAMS.r,
-    PARAMS.p,
+    activeParams.N,
+    activeParams.r,
+    activeParams.p,
     salt.toString('base64url'),
     hash.toString('base64url'),
   ].join('$');

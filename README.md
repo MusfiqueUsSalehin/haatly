@@ -1,5 +1,3 @@
-
-
 # Haatly
 
 Rescuing surplus and imperfect produce on its way from farm to table in Bangladesh.

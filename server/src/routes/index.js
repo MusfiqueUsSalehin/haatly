@@ -7,6 +7,7 @@ import { createAiRouter } from './ai.js';
 import { createPricingRouter } from './pricing.js';
 import { createLotsRouter } from './lots.js';
 import { createBoxesRouter } from './boxes.js';
+import { createOrdersRouter } from './orders.js';
 
 export function createApiRouter({ env, tokens, ai }) {
   const router = Router();
@@ -19,6 +20,7 @@ export function createApiRouter({ env, tokens, ai }) {
   router.use('/pricing', createPricingRouter({ tokens }));
   router.use('/lots', createLotsRouter({ tokens, ai }));
   router.use('/boxes', createBoxesRouter());
+  router.use('/orders', createOrdersRouter({ tokens, otpSecret: env.JWT_SECRET }));
 
   return router;
 }
