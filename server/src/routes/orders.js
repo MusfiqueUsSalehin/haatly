@@ -8,6 +8,9 @@ import { describeOrder } from '../services/orders/describeOrder.js';
 import { placeOrder } from '../services/orders/placeOrder.js';
 import { AppError } from '../utils/AppError.js';
 
+import { cancelOrderSchema } from '../schemas/orders.js';
+import { cancelOrder } from '../services/orders/cancelOrder.js';
+
 /** Customer routes: place orders and follow their own. */
 export function createOrdersRouter({ tokens, otpSecret, perUserPerHour = 20 }) {
   const router = Router();
@@ -52,6 +55,20 @@ export function createOrdersRouter({ tokens, otpSecret, perUserPerHour = 20 }) {
     if (!order) throw new AppError(404, 'order_not_found', 'Order not found');
     res.json({ order: describeOrder(order, { otpSecret }) });
   });
+
+  router.post(
+    '/:code/cancel',
+    validate(orderCodeParams, 'params'),
+    validate(cancelOrderSchema),
+    async (req, res) => {
+      const order = await cancelOrder({
+        customer: req.user,
+        code: req.valid.params.code,
+        reason: req.valid.body.reason,
+      });
+      res.json({ order: describeOrder(order) });
+    },
+  );
 
   return router;
 }
