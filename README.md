@@ -28,4 +28,3 @@ Setup instructions will be added as the server and client are built.
 ## License
 
 [MIT](LICENSE)
-EOF
