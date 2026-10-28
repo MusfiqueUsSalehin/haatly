@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { createHmac } from 'node:crypto';
 
 export class EnvError extends Error {
   constructor(message) {
@@ -9,6 +10,10 @@ export class EnvError extends Error {
 
 // Secrets that look copied from an example file must never reach production.
 const PLACEHOLDER_SECRET = /change[-_]?me|example|dev[-_]?only|your[-_]?secret/i;
+
+/** Without its own secret, the webhook secret is derived from JWT_SECRET: stable, never equal to it. */
+const deriveWebhookSecret = (jwtSecret) =>
+  createHmac('sha256', jwtSecret).update('payment-webhook-secret').digest('hex');
 
 const schema = z
   .object({
@@ -53,6 +58,19 @@ const schema = z
     AI_TIMEOUT_MS: z.coerce.number().int().min(1000).max(60000).default(15000),
     // Hard cap on model calls per rolling 24 hours. Past it, the rules answer instead.
     AI_MAX_CALLS_PER_DAY: z.coerce.number().int().min(0).default(500),
+
+    // "none" means cash on delivery only. "sandbox" pretends to be a wallet gateway for
+    // development and is refused in production.
+    PAYMENT_PROVIDER: z.enum(['none', 'sandbox']).default('none'),
+    PAYMENT_WEBHOOK_SECRET: z
+      .string()
+      .optional()
+      .transform((value) => value?.trim() || undefined)
+      .refine((value) => value === undefined || value.length >= 32, {
+        message: 'must be at least 32 characters',
+      }),
+    // How long a wallet order is held, with its stock reserved, waiting for payment.
+    PAYMENT_WINDOW_MINUTES: z.coerce.number().int().min(5).max(120).default(15),
   })
   .refine((env) => !(env.NODE_ENV === 'production' && PLACEHOLDER_SECRET.test(env.JWT_SECRET)), {
     path: ['JWT_SECRET'],
@@ -61,7 +79,19 @@ const schema = z
   .refine((env) => env.AI_PROVIDER !== 'anthropic' || Boolean(env.ANTHROPIC_API_KEY), {
     path: ['ANTHROPIC_API_KEY'],
     message: 'is required when AI_PROVIDER is anthropic',
-  });
+  })
+  .refine((env) => env.AI_PROVIDER !== 'anthropic' || Boolean(env.ANTHROPIC_API_KEY), {
+    path: ['ANTHROPIC_API_KEY'],
+    message: 'is required when AI_PROVIDER is anthropic',
+  })
+  .refine((env) => !(env.NODE_ENV === 'production' && env.PAYMENT_PROVIDER === 'sandbox'), {
+    path: ['PAYMENT_PROVIDER'],
+    message: 'the sandbox payment provider cannot be used in production',
+  })
+  .transform((env) => ({
+    ...env,
+    PAYMENT_WEBHOOK_SECRET: env.PAYMENT_WEBHOOK_SECRET ?? deriveWebhookSecret(env.JWT_SECRET),
+  }));
 
 /**
  * Validate raw environment variables and return a frozen config object.

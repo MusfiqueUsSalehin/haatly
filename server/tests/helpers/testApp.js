@@ -8,6 +8,7 @@ export function makeTestEnv(overrides = {}) {
     MONGODB_URI: 'mongodb://127.0.0.1:27017/haatly_test',
     JWT_SECRET: 'test-secret-test-secret-test-secret-1234',
     AUTH_RATE_LIMIT_MAX: '1000',
+    PAYMENT_PROVIDER: 'sandbox',
     ...overrides,
   });
 }
