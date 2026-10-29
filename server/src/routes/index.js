@@ -9,7 +9,9 @@ import { createLotsRouter } from './lots.js';
 import { createBoxesRouter } from './boxes.js';
 import { createOrdersRouter } from './orders.js';
 
-export function createApiRouter({ env, tokens, ai }) {
+import { createPaymentsRouter } from './payments.js';
+
+export function createApiRouter({ env, tokens, ai, payments }) {
   const router = Router();
 
   router.use('/health', healthRouter);
@@ -20,7 +22,17 @@ export function createApiRouter({ env, tokens, ai }) {
   router.use('/pricing', createPricingRouter({ tokens }));
   router.use('/lots', createLotsRouter({ tokens, ai }));
   router.use('/boxes', createBoxesRouter());
-  router.use('/orders', createOrdersRouter({ tokens, otpSecret: env.JWT_SECRET }));
+  router.use(
+    '/orders',
+    createOrdersRouter({
+      tokens,
+      otpSecret: env.JWT_SECRET,
+      provider: payments,
+      paymentWindowMinutes: env.PAYMENT_WINDOW_MINUTES,
+    }),
+  );
+
+  router.use('/payments', createPaymentsRouter({ env, tokens, provider: payments }));
 
   return router;
 }

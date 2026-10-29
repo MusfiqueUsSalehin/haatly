@@ -15,7 +15,7 @@ const TRANSITIONS = {
 };
 export const canTransition = (from, to) => TRANSITIONS[from]?.includes(to) ?? false;
 
-export const PAYMENT_METHODS = Object.freeze(['cod']);
+export const PAYMENT_METHODS = Object.freeze(['cod', 'wallet']);
 export const PAYMENT_STATUSES = Object.freeze(['unpaid', 'paid', 'refunded']);
 
 export const ORDER_CODE_PATTERN = /^ORD-[A-HJ-NP-Z2-9]{8}$/;

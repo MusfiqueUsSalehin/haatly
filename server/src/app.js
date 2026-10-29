@@ -4,6 +4,7 @@ import cors from 'cors';
 import pinoHttp from 'pino-http';
 import { createApiRouter } from './routes/index.js';
 import { createAiGatewayFromEnv } from './services/ai/index.js';
+import { createPaymentProvider } from './services/payments/index.js';
 import { createTokenService } from './services/tokenService.js';
 import { notFound } from './middleware/notFound.js';
 import { errorHandler } from './middleware/errorHandler.js';
@@ -11,9 +12,14 @@ import { errorHandler } from './middleware/errorHandler.js';
 /**
  * Build the Express app. It takes its config and logger as arguments instead of
  * reading globals, so tests can create as many isolated apps as they like.
- * Tests may also pass their own `ai` gateway.
+ * Tests may also pass their own `ai` gateway and `payments` provider.
  */
-export function createApp({ env, logger, ai = createAiGatewayFromEnv({ env, logger }) }) {
+export function createApp({
+  env,
+  logger,
+  ai = createAiGatewayFromEnv({ env, logger }),
+  payments = createPaymentProvider(env),
+}) {
   const app = express();
 
   app.disable('x-powered-by');
@@ -22,13 +28,17 @@ export function createApp({ env, logger, ai = createAiGatewayFromEnv({ env, logg
   app.use(cors({ origin: env.CLIENT_ORIGINS, credentials: true }));
   app.use(pinoHttp({ logger }));
 
-  // Crate photos arrive as base64, so the AI routes get a larger body limit. This parser
+  // Crate photos arrive as base64, so these routes get a larger body limit. This parser
   // must come first: it reads those bodies, and the strict global one below then skips them.
+
+  // The payment webhook is checked against the exact bytes the gateway signed, so it must
+  // be read raw, before any JSON parser touches it.
+  app.use('/api/payments/webhook', express.raw({ type: () => true, limit: '100kb' }));
   app.use(['/api/ai', '/api/lots'], express.json({ limit: '2mb' }));
   app.use(express.json({ limit: '100kb' }));
 
   const tokens = createTokenService(env);
-  app.use('/api', createApiRouter({ env, tokens, ai }));
+  app.use('/api', createApiRouter({ env, tokens, ai, payments }));
 
   app.use(notFound);
   app.use(errorHandler(logger));
