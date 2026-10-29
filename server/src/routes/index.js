@@ -9,6 +9,8 @@ import { createLotsRouter } from './lots.js';
 import { createBoxesRouter } from './boxes.js';
 import { createOrdersRouter } from './orders.js';
 
+import { createPaymentsRouter } from './payments.js';
+
 export function createApiRouter({ env, tokens, ai, payments }) {
   const router = Router();
 
@@ -29,6 +31,8 @@ export function createApiRouter({ env, tokens, ai, payments }) {
       paymentWindowMinutes: env.PAYMENT_WINDOW_MINUTES,
     }),
   );
+
+  router.use('/payments', createPaymentsRouter({ env, tokens, provider: payments }));
 
   return router;
 }

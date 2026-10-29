@@ -30,6 +30,10 @@ export function createApp({
 
   // Crate photos arrive as base64, so these routes get a larger body limit. This parser
   // must come first: it reads those bodies, and the strict global one below then skips them.
+
+  // The payment webhook is checked against the exact bytes the gateway signed, so it must
+  // be read raw, before any JSON parser touches it.
+  app.use('/api/payments/webhook', express.raw({ type: () => true, limit: '100kb' }));
   app.use(['/api/ai', '/api/lots'], express.json({ limit: '2mb' }));
   app.use(express.json({ limit: '100kb' }));
 
