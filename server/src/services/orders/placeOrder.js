@@ -1,8 +1,10 @@
 import { ORDER_STATUS } from '../../constants/orders.js';
+import { PAYMENT_STATUS } from '../../constants/payments.js';
 import { BOX_STATUS, Box } from '../../models/Box.js';
 import { City } from '../../models/City.js';
 import { Lot } from '../../models/Lot.js';
 import { Order } from '../../models/Order.js';
+import { Payment } from '../../models/Payment.js';
 import { Zone } from '../../models/Zone.js';
 import { AppError } from '../../utils/AppError.js';
 import { bangladeshDate } from '../../utils/dates.js';
@@ -13,6 +15,7 @@ import { planAllocations } from './planAllocations.js';
 import { releaseStock, reserveStock } from './stock.js';
 
 const MAX_ATTEMPTS = 3;
+const MINUTE_MS = 60 * 1000;
 
 /** Work out, from live data, which kilos fill each box and what each box costs now. */
 async function planItems({ items, cityCode, date, now }) {
@@ -56,38 +59,74 @@ async function planItems({ items, cityCode, date, now }) {
   });
 }
 
-async function saveOrder({ customer, body, zone, items, now }) {
-  // A random code can in theory collide; the unique index catches it and we retry.
-  for (let attempt = 0; attempt < 3; attempt++) {
-    try {
-      return await Order.create({
-        code: randomCode('ORD'),
-        customer: customer._id,
-        recipientName: body.recipientName,
-        phone: body.phone,
-        cityCode: zone.cityCode,
-        zoneCode: zone.code,
-        address: body.address,
-        items,
-        ...orderTotals(items),
-        paymentMethod: body.paymentMethod,
-        status: ORDER_STATUS.PLACED,
-        statusHistory: [{ status: ORDER_STATUS.PLACED, at: now }],
-        otpSalt: newOtpSalt(),
-      });
-    } catch (err) {
-      if (err?.code !== 11000) throw err;
-    }
+/**
+ * Save the order and its payment record. A wallet order first asks the gateway to create
+ * a charge. If the payment record cannot be saved, the order is removed again (the
+ * customer has not seen it yet).
+ */
+async function saveOrderAndPayment({ customer, body, zone, items, provider, windowMinutes, now }) {
+  const orderCode = randomCode('ORD');
+  const totals = orderTotals(items);
+  const wallet = body.paymentMethod === 'wallet';
+
+  const charge = wallet
+    ? await provider.createCharge({ orderCode, amountBdt: totals.totalBdt })
+    : null;
+
+  const order = await Order.create({
+    code: orderCode,
+    customer: customer._id,
+    recipientName: body.recipientName,
+    phone: body.phone,
+    cityCode: zone.cityCode,
+    zoneCode: zone.code,
+    address: body.address,
+    items,
+    ...totals,
+    paymentMethod: body.paymentMethod,
+    status: ORDER_STATUS.PLACED,
+    statusHistory: [{ status: ORDER_STATUS.PLACED, at: now }],
+    otpSalt: newOtpSalt(),
+  });
+
+  try {
+    const payment = await Payment.create({
+      code: randomCode('PAY'),
+      orderCode,
+      customer: customer._id,
+      method: body.paymentMethod,
+      provider: wallet ? provider.name : 'cod',
+      amountBdt: totals.totalBdt,
+      ...(wallet && {
+        providerRef: charge.providerRef,
+        expiresAt: new Date(now.getTime() + windowMinutes * MINUTE_MS),
+      }),
+      history: [{ status: PAYMENT_STATUS.PENDING, at: now }],
+    });
+    return { order, payment, payUrl: charge?.payUrl ?? null };
+  } catch (err) {
+    await Order.deleteOne({ code: orderCode });
+    throw err;
   }
-  throw new Error('could not allocate a unique order code');
 }
 
 /**
- * Place an order: plan the stock from live data, reserve it atomically, save the order.
- * If stock moves between planning and reserving, plan again (up to 3 times). If saving
- * fails after stock was taken, the stock is put back.
+ * Place an order: plan the stock from live data, reserve it atomically, then save the
+ * order and its payment. If stock moves between planning and reserving, plan again (up
+ * to 3 times). If saving fails after stock was taken, the stock is put back.
+ * Returns { order, payment, payUrl }.
  */
-export async function placeOrder({ customer, body, now = new Date() }) {
+export async function checkout({
+  customer,
+  body,
+  provider = null,
+  paymentWindowMinutes = 15,
+  now = new Date(),
+}) {
+  if (body.paymentMethod === 'wallet' && !provider) {
+    throw new AppError(400, 'payment_unavailable', 'Wallet payment is not available right now');
+  }
+
   const zone = await Zone.findOne({ code: body.zoneCode, active: true }).lean();
   const city = zone && (await City.findOne({ code: zone.cityCode, active: true }).lean());
   if (!zone || !city) throw new AppError(404, 'zone_not_found', 'Delivery area not found');
@@ -106,10 +145,23 @@ export async function placeOrder({ customer, body, now = new Date() }) {
     }
 
     try {
-      return await saveOrder({ customer, body, zone, items, now });
+      return await saveOrderAndPayment({
+        customer,
+        body,
+        zone,
+        items,
+        provider,
+        windowMinutes: paymentWindowMinutes,
+        now,
+      });
     } catch (err) {
       await releaseStock(allocations, now);
       throw err;
     }
   }
+}
+
+/** Same as checkout(), returning only the order. */
+export async function placeOrder(args) {
+  return (await checkout(args)).order;
 }

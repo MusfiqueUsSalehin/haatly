@@ -45,4 +45,16 @@ describe('describeOrder', () => {
     const order = make('placed', { otpSalt: undefined });
     expect(() => describeOrder(order, { otpSecret: SECRET })).toThrow(/otpSalt/);
   });
+
+  it('hides the code of a wallet order until it is paid', () => {
+    const unpaid = make('placed', { paymentMethod: 'wallet', paymentStatus: 'unpaid' });
+    expect(describeOrder(unpaid, { otpSecret: SECRET }).deliveryOtp).toBeNull();
+    const paid = make('placed', { paymentMethod: 'wallet', paymentStatus: 'paid' });
+    expect(describeOrder(paid, { otpSecret: SECRET }).deliveryOtp).toMatch(/^\d{6}$/);
+  });
+
+  it('shows the code of a cash order straight away', () => {
+    const cash = make('placed', { paymentMethod: 'cod' });
+    expect(describeOrder(cash, { otpSecret: SECRET }).deliveryOtp).toMatch(/^\d{6}$/);
+  });
 });
