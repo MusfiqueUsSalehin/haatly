@@ -9,7 +9,7 @@ export const ORDER_STATUSES = Object.freeze(Object.values(ORDER_STATUS));
 // An order can only move forward, and only be cancelled before it leaves for delivery.
 const TRANSITIONS = {
   placed: ['out_for_delivery', 'cancelled'],
-  out_for_delivery: ['delivered'],
+  out_for_delivery: ['delivered', 'placed'],
   delivered: [],
   cancelled: [],
 };

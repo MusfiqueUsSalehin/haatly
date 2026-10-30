@@ -8,6 +8,7 @@ import { createPricingRouter } from './pricing.js';
 import { createLotsRouter } from './lots.js';
 import { createBoxesRouter } from './boxes.js';
 import { createOrdersRouter } from './orders.js';
+import { createRiderRouter } from './rider.js';
 
 import { createPaymentsRouter } from './payments.js';
 
@@ -33,6 +34,7 @@ export function createApiRouter({ env, tokens, ai, payments }) {
   );
 
   router.use('/payments', createPaymentsRouter({ env, tokens, provider: payments }));
+  router.use('/rider', createRiderRouter({ tokens, otpSecret: env.JWT_SECRET }));
 
   return router;
 }
