@@ -1,5 +1,7 @@
 import mongoose from 'mongoose';
 import { TIER_NAMES } from '../constants/boxes.js';
+
+import { RUN_CODE_PATTERN } from '../constants/dispatch.js';
 import {
   MAX_ITEMS,
   MAX_QTY_PER_ITEM,
@@ -91,6 +93,8 @@ const orderSchema = new mongoose.Schema(
     cancelledAt: { type: Date },
     cancelReason: { type: String, trim: true, maxlength: 200 },
     deliveredAt: { type: Date },
+    // The delivery run this order has been given to, if any. Internal: never sent to customers.
+    runCode: { type: String, match: RUN_CODE_PATTERN, default: null },
 
     // The delivery code itself is never stored: see utils/otp.js.
     otpSalt: { type: String, required: true, select: false },
@@ -101,6 +105,7 @@ const orderSchema = new mongoose.Schema(
 
 orderSchema.index({ customer: 1, createdAt: -1 });
 orderSchema.index({ status: 1, cityCode: 1, zoneCode: 1 });
+orderSchema.index({ runCode: 1 });
 
 orderSchema.pre('validate', function () {
   if (this.items.length < 1 || this.items.length > MAX_ITEMS) {
@@ -148,8 +153,8 @@ orderSchema.set('toJSON', {
   transform(doc, ret) {
     cleanJson(doc, ret);
     delete ret.otpSalt;
+    delete ret.runCode;
     return ret;
   },
 });
-
 export const Order = mongoose.model('Order', orderSchema);

@@ -14,6 +14,7 @@ import { createUser } from '../services/userService.js';
 import { AppError } from '../utils/AppError.js';
 
 import { createAdminShelfRouter } from './adminShelf.js';
+import { createAdminDispatchRouter } from './adminDispatch.js';
 
 export function createAdminRouter({ tokens }) {
   const router = Router();
@@ -21,6 +22,7 @@ export function createAdminRouter({ tokens }) {
   router.use(authenticate(tokens), requireRole('admin'));
   router.use('/produce', createAdminCatalogRouter());
   router.use('/shelf', createAdminShelfRouter());
+  router.use(createAdminDispatchRouter());
 
   // Filters use exact matches only, so there is no free-text search to inject into.
   router.get('/users', validate(listUsersQuery, 'query'), async (req, res) => {

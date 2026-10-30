@@ -11,6 +11,8 @@ import { buildShelf } from '../../src/services/boxes/buildShelf.js';
 import { bangladeshDate } from '../../src/utils/dates.js';
 import { makeLot } from './lotFixture.js';
 import { Payment } from '../../src/models/Payment.js';
+import { RiderProfile } from '../../src/models/RiderProfile.js';
+import { Run } from '../../src/models/Run.js';
 
 // Six lots of 100 kg at 56 taka/kg. The shelf this builds for Dhaka is:
 //   mini   potato + spinach   112 taka   100 boxes
@@ -28,7 +30,9 @@ const SIX = [
 /** Reset the database to a seeded catalog plus today's built shelf. Returns { today }. */
 export async function setUpShelf({ now = new Date() } = {}) {
   await Promise.all(
-    [Lot, Box, Hub, Produce, City, Zone, Order, Payment].map((model) => model.deleteMany({})),
+    [Lot, Box, Hub, Produce, City, Zone, Order, Payment, Run, RiderProfile].map((model) =>
+      model.deleteMany({}),
+    ),
   );
   await seedCatalog();
   const farmer = new mongoose.Types.ObjectId();

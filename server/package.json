@@ -18,7 +18,8 @@
     "admin:create": "node --env-file=.env src/scripts/createAdmin.js",
     "seed:catalog": "node --env-file=.env src/scripts/seedCatalog.js",
     "shelf:build": "node --env-file=.env src/scripts/buildShelf.js",
-    "payments:maintain": "node --env-file=.env src/scripts/paymentMaintenance.js"
+    "payments:maintain": "node --env-file=.env src/scripts/paymentMaintenance.js",
+    "dispatch:run": "node --env-file=.env src/scripts/dispatch.js"
   },
   "dependencies": {
     "cors": "^2.8.6",

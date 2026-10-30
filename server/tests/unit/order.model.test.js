@@ -127,4 +127,10 @@ describe('Order', () => {
     expect(json.__v).toBeUndefined();
     expect(json.code).toBe('ORD-ABCD2345');
   });
+
+  it('never shows which delivery run an order is in', () => {
+    const json = new Order(build([makeItem()], { runCode: 'RUN-ABCD2345' })).toJSON();
+    expect(json.runCode).toBeUndefined();
+    expect(json.otpSalt).toBeUndefined();
+  });
 });
