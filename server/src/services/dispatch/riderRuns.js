@@ -4,6 +4,7 @@ import { Run } from '../../models/Run.js';
 import { AppError } from '../../utils/AppError.js';
 import { verifyOtp } from '../../utils/otp.js';
 import { settleCashPayment } from '../payments/settle.js';
+import { announceOrderUpdated, announceRun } from '../../realtime/announce.js';
 
 /** A run is completed once none of its stops is still pending. */
 const finishIfDone = (code, now) =>
@@ -76,7 +77,12 @@ export async function startRun({ rider, code, now = new Date() }) {
     }
   }
   await finishIfDone(code, now);
-  return Run.findOne({ code });
+  const started = await Run.findOne({ code });
+  for (const stop of started.stops) {
+    if (stop.status === STOP_STATUS.PENDING) await announceOrderUpdated(stop.orderCode);
+  }
+  await announceRun(started);
+  return started;
 }
 
 async function completeDelivery({ code, orderCode, order, now }) {
@@ -87,7 +93,10 @@ async function completeDelivery({ code, orderCode, order, now }) {
   // Safe to repeat: a retry after a crash finishes whatever was left undone.
   if (order.paymentMethod === 'cod') await settleCashPayment({ orderCode, now });
   await finishIfDone(code, now);
-  return Run.findOne({ code });
+  const run = await Run.findOne({ code });
+  await announceOrderUpdated(orderCode);
+  await announceRun(run);
+  return run;
 }
 
 /**
@@ -163,5 +172,8 @@ export async function failStop({ rider, code, orderCode, reason, now = new Date(
     { $set: { 'stops.$.status': STOP_STATUS.FAILED, 'stops.$.failReason': reason } },
   );
   await finishIfDone(code, now);
-  return Run.findOne({ code });
+  const run = await Run.findOne({ code });
+  await announceOrderUpdated(orderCode);
+  await announceRun(run);
+  return run;
 }

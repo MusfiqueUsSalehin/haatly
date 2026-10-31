@@ -8,6 +8,9 @@ import { createTokenService } from '../services/tokenService.js';
 import { SocketAuthError, authenticateHandshake, msUntil } from './auth.js';
 import { createRateGate, createWindowLimiter, parseLocation } from './location.js';
 import { MAX_ORDER_SUBSCRIPTIONS, canSubscribeToOrder, roomsForUser } from './policy.js';
+
+import { subscribe } from './events.js';
+import { routeEvent } from './routing.js';
 import { rooms } from './rooms.js';
 
 const LOCATION_MIN_INTERVAL_MS = 2000;
@@ -141,12 +144,20 @@ export function createRealtime({ httpServer, env, logger, tokens = createTokenSe
     });
   });
 
+  // Domain events (order placed, payment confirmed, stop delivered...) fan out to the right rooms.
+  const stopListening = subscribe((type, data) => {
+    for (const { room, event, payload } of routeEvent(type, data)) io.to(room).emit(event, payload);
+  });
+
   return {
     io,
     emitToOrder: (orderCode, event, payload) => io.to(rooms.order(orderCode)).emit(event, payload),
     emitToUser: (userId, event, payload) => io.to(rooms.user(userId)).emit(event, payload),
     emitToAdmins: (event, payload) => io.to(rooms.admin).emit(event, payload),
     /** Disconnects everyone and closes the HTTP server too. */
-    close: () => new Promise((resolve) => io.close(() => resolve())),
+    close: () => {
+      stopListening();
+      return new Promise((resolve) => io.close(() => resolve()));
+    },
   };
 }

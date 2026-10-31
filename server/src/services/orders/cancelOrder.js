@@ -3,6 +3,7 @@ import { Order } from '../../models/Order.js';
 import { AppError } from '../../utils/AppError.js';
 import { closePaymentForCancelledOrder } from '../payments/settle.js';
 import { releaseStock } from './stock.js';
+import { announceOrderUpdated } from '../../realtime/announce.js';
 
 /** The kilos an order is holding, in the shape releaseStock() wants. */
 export const allocationsOf = (order) =>
@@ -56,5 +57,6 @@ export async function cancelOrder({
 
   await releaseStock(allocationsOf(order), now);
   await closePaymentForCancelledOrder({ order, provider, now, logger });
+  await announceOrderUpdated(code);
   return (await Order.findOne({ code })) ?? order; // re-read: the payment status may have changed
 }

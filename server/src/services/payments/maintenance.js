@@ -5,6 +5,7 @@ import { Payment } from '../../models/Payment.js';
 import { allocationsOf, cancelPlacedOrder } from '../orders/cancelOrder.js';
 import { releaseStock } from '../orders/stock.js';
 import { movePayment, refundPayment } from './settle.js';
+import { announceOrderUpdated } from '../../realtime/announce.js';
 
 /**
  * Cancel wallet orders nobody paid for in time and put their stock back. The payment is
@@ -32,7 +33,10 @@ export async function expireUnpaidOrders(now = new Date()) {
     if (!claimed) continue;
 
     const order = await cancelPlacedOrder({ code: orderCode, reason: 'payment_expired', now });
-    if (order) await releaseStock(allocationsOf(order), now);
+    if (order) {
+      await releaseStock(allocationsOf(order), now);
+      await announceOrderUpdated(order.code);
+    }
     expired += 1;
   }
   return expired;
