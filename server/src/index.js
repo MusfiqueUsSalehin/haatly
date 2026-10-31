@@ -1,7 +1,9 @@
+import { createServer } from 'node:http';
 import { parseEnv } from './config/env.js';
 import { createLogger } from './config/logger.js';
 import { connectDb, disconnectDb } from './config/db.js';
 import { createApp } from './app.js';
+import { createRealtime } from './realtime/server.js';
 
 let env;
 try {
@@ -21,7 +23,10 @@ try {
 }
 
 const app = createApp({ env, logger });
-const server = app.listen(env.PORT, () => {
+const server = createServer(app);
+const realtime = createRealtime({ httpServer: server, env, logger });
+
+server.listen(env.PORT, () => {
   logger.info(`api listening on http://localhost:${env.PORT}`);
 });
 
@@ -34,7 +39,7 @@ function shutdown(signal) {
     logger.error('forced exit after timeout');
     process.exit(1);
   }, 10_000).unref();
-  server.close(async () => {
+  realtime.close().then(async () => {
     await disconnectDb();
     process.exit(0);
   });

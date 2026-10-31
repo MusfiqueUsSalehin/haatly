@@ -13,6 +13,7 @@ import { newOtpSalt } from '../../utils/otp.js';
 import { orderTotals } from './orderPolicy.js';
 import { planAllocations } from './planAllocations.js';
 import { releaseStock, reserveStock } from './stock.js';
+import { announceOrderPlaced } from '../../realtime/announce.js';
 
 const MAX_ATTEMPTS = 3;
 const MINUTE_MS = 60 * 1000;
@@ -144,8 +145,9 @@ export async function checkout({
       throw err;
     }
 
+    let saved;
     try {
-      return await saveOrderAndPayment({
+      saved = await saveOrderAndPayment({
         customer,
         body,
         zone,
@@ -158,6 +160,8 @@ export async function checkout({
       await releaseStock(allocations, now);
       throw err;
     }
+    await announceOrderPlaced(saved.order);
+    return saved;
   }
 }
 

@@ -7,6 +7,7 @@ import { verifySignature } from '../../utils/signature.js';
 import { allocationsOf, cancelPlacedOrder } from '../orders/cancelOrder.js';
 import { releaseStock } from '../orders/stock.js';
 import { movePayment } from './settle.js';
+import { announceOrderUpdated } from '../../realtime/announce.js';
 
 const LATE_NOTE = 'late payment refunded';
 
@@ -42,6 +43,7 @@ async function onSucceeded({ payment, provider, now }) {
     });
     if (paid) {
       await Order.updateOne({ code: paid.orderCode }, { paymentStatus: 'paid' });
+      await announceOrderUpdated(paid.orderCode);
       return { outcome: 'paid' };
     }
     // Lost a race (cancelled or failed a moment ago): handle it as a late payment.
@@ -68,7 +70,10 @@ async function onFailed({ payment, now }) {
   if (!failed) return { outcome: 'ignored' };
 
   const order = await cancelPlacedOrder({ code: payment.orderCode, reason: 'payment_failed', now });
-  if (order) await releaseStock(allocationsOf(order), now);
+  if (order) {
+    await releaseStock(allocationsOf(order), now);
+    await announceOrderUpdated(order.code);
+  }
   return { outcome: 'failed' };
 }
 

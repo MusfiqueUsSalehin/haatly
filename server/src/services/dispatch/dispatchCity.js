@@ -10,6 +10,7 @@ import { AppError } from '../../utils/AppError.js';
 import { randomCode } from '../../utils/ids.js';
 import { planRuns } from '../routing/planRuns.js';
 import { orderWeightKg } from './orderWeight.js';
+import { announceRun } from '../../realtime/announce.js';
 
 /**
  * Turn a planned trip into a saved run. The orders are claimed first with one atomic
@@ -29,8 +30,9 @@ async function createRun({ planned, cityCode, depotCode }) {
   const stops = planned.stops.filter((stop) => claimed.has(stop.orderCode));
   if (stops.length === 0) return null;
 
+  let run;
   try {
-    return await Run.create({
+    run = await Run.create({
       code,
       rider: planned.riderId,
       cityCode,
@@ -45,6 +47,8 @@ async function createRun({ planned, cityCode, depotCode }) {
     await Order.updateMany({ runCode: code }, { $set: { runCode: null } });
     throw err;
   }
+  await announceRun(run, 'created');
+  return run;
 }
 
 /**

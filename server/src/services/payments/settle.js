@@ -3,6 +3,7 @@ import { PAYMENT_STATUS, canMovePayment } from '../../constants/payments.js';
 import { Order } from '../../models/Order.js';
 import { Payment } from '../../models/Payment.js';
 import { AppError } from '../../utils/AppError.js';
+import { announceOrderUpdated } from '../../realtime/announce.js';
 
 /**
  * Move a payment to a new status, but only if it is still in `from`. Returns the updated
@@ -40,7 +41,10 @@ export async function refundPayment({ payment, provider, now = new Date() }) {
     now,
     set: { refundedBdt: payment.amountBdt },
   });
-  if (refunded) await Order.updateOne({ code: payment.orderCode }, { paymentStatus: 'refunded' });
+  if (refunded) {
+    await Order.updateOne({ code: payment.orderCode }, { paymentStatus: 'refunded' });
+    await announceOrderUpdated(payment.orderCode);
+  }
   return refunded;
 }
 
