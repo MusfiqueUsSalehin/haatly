@@ -8,9 +8,10 @@ import { createPricingRouter } from './pricing.js';
 import { createLotsRouter } from './lots.js';
 import { createBoxesRouter } from './boxes.js';
 import { createOrdersRouter } from './orders.js';
-import { createRiderRouter } from './rider.js';
-
 import { createPaymentsRouter } from './payments.js';
+import { createRiderRouter } from './rider.js';
+import { createEarningsRouter } from './earnings.js';
+import { createImpactRouter } from './impact.js';
 
 export function createApiRouter({ env, tokens, ai, payments }) {
   const router = Router();
@@ -32,9 +33,10 @@ export function createApiRouter({ env, tokens, ai, payments }) {
       paymentWindowMinutes: env.PAYMENT_WINDOW_MINUTES,
     }),
   );
-
   router.use('/payments', createPaymentsRouter({ env, tokens, provider: payments }));
   router.use('/rider', createRiderRouter({ tokens, otpSecret: env.JWT_SECRET }));
+  router.use('/earnings', createEarningsRouter({ tokens }));
+  router.use('/impact', createImpactRouter({ tokens }));
 
   return router;
 }
