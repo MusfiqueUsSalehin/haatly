@@ -5,6 +5,7 @@ import { AppError } from '../../utils/AppError.js';
 import { verifyOtp } from '../../utils/otp.js';
 import { settleCashPayment } from '../payments/settle.js';
 import { announceOrderUpdated, announceRun } from '../../realtime/announce.js';
+import { recordEarningsSafely } from '../earnings/recordEarnings.js';
 
 /** A run is completed once none of its stops is still pending. */
 const finishIfDone = (code, now) =>
@@ -92,6 +93,7 @@ async function completeDelivery({ code, orderCode, order, now }) {
   );
   // Safe to repeat: a retry after a crash finishes whatever was left undone.
   if (order.paymentMethod === 'cod') await settleCashPayment({ orderCode, now });
+  await recordEarningsSafely(orderCode);
   await finishIfDone(code, now);
   const run = await Run.findOne({ code });
   await announceOrderUpdated(orderCode);

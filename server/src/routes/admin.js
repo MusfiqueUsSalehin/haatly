@@ -15,6 +15,7 @@ import { AppError } from '../utils/AppError.js';
 
 import { createAdminShelfRouter } from './adminShelf.js';
 import { createAdminDispatchRouter } from './adminDispatch.js';
+import { createAdminEarningsRouter } from './adminEarnings.js';
 
 export function createAdminRouter({ tokens }) {
   const router = Router();
@@ -22,6 +23,7 @@ export function createAdminRouter({ tokens }) {
   router.use(authenticate(tokens), requireRole('admin'));
   router.use('/produce', createAdminCatalogRouter());
   router.use('/shelf', createAdminShelfRouter());
+  router.use('/earnings', createAdminEarningsRouter());
   router.use(createAdminDispatchRouter());
 
   // Filters use exact matches only, so there is no free-text search to inject into.
