@@ -107,6 +107,8 @@ orderSchema.index({ customer: 1, createdAt: -1 });
 orderSchema.index({ status: 1, cityCode: 1, zoneCode: 1 });
 orderSchema.index({ runCode: 1 });
 
+orderSchema.index({ cityCode: 1, createdAt: -1 });
+
 orderSchema.pre('validate', function () {
   if (this.items.length < 1 || this.items.length > MAX_ITEMS) {
     this.invalidate('items', `an order needs 1 to ${MAX_ITEMS} boxes`);
