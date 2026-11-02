@@ -12,8 +12,8 @@ import { createPaymentsRouter } from './payments.js';
 import { createRiderRouter } from './rider.js';
 import { createEarningsRouter } from './earnings.js';
 import { createImpactRouter } from './impact.js';
-
 import { createForecastRouter } from './forecast.js';
+import { createRecipesRouter } from './recipes.js';
 
 export function createApiRouter({ env, tokens, ai, payments }) {
   const router = Router();
@@ -39,8 +39,8 @@ export function createApiRouter({ env, tokens, ai, payments }) {
   router.use('/rider', createRiderRouter({ tokens, otpSecret: env.JWT_SECRET }));
   router.use('/earnings', createEarningsRouter({ tokens }));
   router.use('/impact', createImpactRouter({ tokens }));
-
   router.use('/forecast', createForecastRouter({ tokens }));
+  router.use('/recipes', createRecipesRouter({ tokens, ai }));
 
   return router;
 }
