@@ -71,6 +71,13 @@ const schema = z
       }),
     // How long a wallet order is held, with its stock reserved, waiting for payment.
     PAYMENT_WINDOW_MINUTES: z.coerce.number().int().min(5).max(120).default(15),
+
+    // Set to false to run no scheduled jobs in this process (for example on a second web
+    // server, or while developing). Jobs run safely on several servers either way.
+    ENABLE_SCHEDULER: z
+      .enum(['true', 'false'])
+      .default('true')
+      .transform((value) => value === 'true'),
   })
   .refine((env) => !(env.NODE_ENV === 'production' && PLACEHOLDER_SECRET.test(env.JWT_SECRET)), {
     path: ['JWT_SECRET'],
