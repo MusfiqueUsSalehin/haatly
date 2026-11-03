@@ -25,13 +25,13 @@ try {
 }
 
 const payments = createPaymentProvider(env);
-const app = createApp({ env, logger, payments });
+const scheduler = env.ENABLE_SCHEDULER ? createAppScheduler({ logger, payments }) : null;
+const app = createApp({ env, logger, payments, scheduler });
 const server = createServer(app);
 const realtime = createRealtime({ httpServer: server, env, logger });
 
 // The scheduled jobs run inside this process. Running several copies of the server is safe:
 // each job is claimed by exactly one of them (see docs/JOBS.md).
-const scheduler = env.ENABLE_SCHEDULER ? createAppScheduler({ logger, payments }) : null;
 
 server.listen(env.PORT, () => {
   logger.info(`api listening on http://localhost:${env.PORT}`);

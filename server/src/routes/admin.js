@@ -17,13 +17,17 @@ import { createAdminShelfRouter } from './adminShelf.js';
 import { createAdminDispatchRouter } from './adminDispatch.js';
 import { createAdminEarningsRouter } from './adminEarnings.js';
 
-export function createAdminRouter({ tokens }) {
+import { createAdminJobsRouter } from './adminJobs.js';
+import { createJobStore } from '../jobs/jobStore.js';
+
+export function createAdminRouter({ tokens, scheduler = null }) {
   const router = Router();
 
   router.use(authenticate(tokens), requireRole('admin'));
   router.use('/produce', createAdminCatalogRouter());
   router.use('/shelf', createAdminShelfRouter());
   router.use('/earnings', createAdminEarningsRouter());
+  router.use('/jobs', createAdminJobsRouter({ scheduler, store: createJobStore() }));
   router.use(createAdminDispatchRouter());
 
   // Filters use exact matches only, so there is no free-text search to inject into.

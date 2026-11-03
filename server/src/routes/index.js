@@ -15,7 +15,7 @@ import { createImpactRouter } from './impact.js';
 import { createForecastRouter } from './forecast.js';
 import { createRecipesRouter } from './recipes.js';
 
-export function createApiRouter({ env, tokens, ai, payments }) {
+export function createApiRouter({ env, tokens, ai, payments, scheduler = null }) {
   const router = Router();
 
   router.use('/health', healthRouter);
@@ -41,6 +41,7 @@ export function createApiRouter({ env, tokens, ai, payments }) {
   router.use('/impact', createImpactRouter({ tokens }));
   router.use('/forecast', createForecastRouter({ tokens }));
   router.use('/recipes', createRecipesRouter({ tokens, ai }));
+  router.use('/admin', createAdminRouter({ tokens, scheduler }));
 
   return router;
 }

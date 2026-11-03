@@ -19,6 +19,7 @@ export function createApp({
   logger,
   ai = createAiGatewayFromEnv({ env, logger }),
   payments = createPaymentProvider(env),
+  scheduler = null,
 }) {
   const app = express();
 
@@ -38,7 +39,7 @@ export function createApp({
   app.use(express.json({ limit: '100kb' }));
 
   const tokens = createTokenService(env);
-  app.use('/api', createApiRouter({ env, tokens, ai, payments }));
+  app.use('/api', createApiRouter({ env, tokens, ai, payments, scheduler }));
 
   app.use(notFound);
   app.use(errorHandler(logger));
