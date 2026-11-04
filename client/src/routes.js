@@ -14,6 +14,7 @@ export const ROUTES = Object.freeze({
   rider: '/rider',
   admin: '/admin',
   hub: '/hub',
+  sandboxPay: '/sandbox/pay/:ref', // dev-only wallet page; server payUrl points here
 });
 
 /** Build a link: path('order', { code: 'ORD-1' }) -> /orders/ORD-1 */
