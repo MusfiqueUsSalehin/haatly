@@ -15,4 +15,7 @@ describe('route table', () => {
     const v = Object.values(ROUTES);
     expect(new Set(v).size).toBe(v.length);
   });
+  it('builds the sandbox pay route', () => {
+    expect(path('sandboxPay', { ref: 'SBX-1' })).toBe('/sandbox/pay/SBX-1');
+  });
 });

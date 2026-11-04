@@ -21,6 +21,7 @@ export function I18nProvider({ children }) {
       t: (key) => strings[lang][key] ?? strings.en[key] ?? key,
       // For bilingual API data like { nameBn, nameEn }.
       pick: (bn, en) => (lang === 'bn' ? bn || en : en || bn),
+      money: (n) => `৳${Number(n).toLocaleString(lang === 'bn' ? 'bn-BD' : 'en-US')}`,
     }),
     [lang],
   );

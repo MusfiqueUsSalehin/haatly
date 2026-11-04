@@ -1,12 +1,16 @@
 // client/src/components/Layout.jsx
 import { Link, NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../auth/AuthContext.jsx';
+import { useCart } from '../cart/CartContext.jsx';
+import { useCity } from '../city/CityContext.jsx';
 import { useI18n } from '../i18n/I18nContext.jsx';
 import { HOME_FOR_ROLE, ROUTES } from '../routes.js';
 
 export default function Layout() {
   const { user, logout } = useAuth();
-  const { t, lang, setLang } = useI18n();
+  const { t, lang, setLang, pick } = useI18n();
+  const { count } = useCart();
+  const { cities, city, setCode } = useCity();
   const navigate = useNavigate();
   const link = ({ isActive }) => (isActive ? 'font-semibold text-leaf' : 'hover:text-leaf');
 
@@ -33,6 +37,23 @@ export default function Layout() {
           </NavLink>
 
           <div className="ml-auto flex items-center gap-3">
+            <select
+              className="input w-auto"
+              aria-label={t('city.label')}
+              value={city?.code ?? ''}
+              onChange={(e) => setCode(e.target.value)}
+            >
+              {cities.map((c) => (
+                <option key={c.code} value={c.code}>
+                  {pick(c.nameBn, c.nameEn)}
+                </option>
+              ))}
+            </select>
+            {(!user || user.role === 'customer') && (
+              <NavLink to={ROUTES.cart} className={link}>
+                {t('cart.title')} ({count})
+              </NavLink>
+            )}
             <button className="btn-ghost" onClick={() => setLang(lang === 'bn' ? 'en' : 'bn')}>
               {lang === 'bn' ? 'EN' : 'বাং'}
             </button>
