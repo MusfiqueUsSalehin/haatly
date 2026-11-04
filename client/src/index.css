@@ -1,0 +1,24 @@
+/* client/src/index.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-jute/30 font-body text-soil antialiased;
+  }
+}
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center rounded-lg px-4 py-2 font-semibold transition disabled:opacity-50;
+  }
+  .btn-primary {
+    @apply btn bg-leaf text-white hover:bg-leaf-dark;
+  }
+  .btn-ghost {
+    @apply btn border border-soil/20 hover:bg-soil/5;
+  }
+  .input {
+    @apply w-full rounded-lg border border-soil/20 bg-white px-3 py-2 focus:border-leaf focus:outline-none;
+  }
+}
