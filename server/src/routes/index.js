@@ -21,7 +21,7 @@ export function createApiRouter({ env, tokens, ai, payments, scheduler = null })
   router.use('/health', healthRouter);
   router.use('/auth', createAuthRouter({ env, tokens }));
   router.use('/catalog', createCatalogRouter());
-  router.use('/admin', createAdminRouter({ tokens }));
+
   router.use('/ai', createAiRouter({ tokens, ai }));
   router.use('/pricing', createPricingRouter({ tokens }));
   router.use('/lots', createLotsRouter({ tokens, ai }));
