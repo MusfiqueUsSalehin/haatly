@@ -1,9 +1,10 @@
 // client/src/pages/OrderTrack.jsx
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { post } from '../api/client.js';
 import { useApi } from '../api/useApi.js';
 import { useI18n } from '../i18n/I18nContext.jsx';
+import { useSocket } from '../realtime/useSocket.js';
 
 const LIVE = ['placed', 'out_for_delivery'];
 
@@ -20,6 +21,11 @@ export default function OrderTrack() {
     reload,
   } = useApi(`/orders/${encodeURIComponent(code)}`, {
     interval: live ? 15000 : undefined,
+  });
+  // Live updates: re-subscribe on every (re)connect, and reload when the server says so.
+  const socketRef = useSocket({
+    connect: () => socketRef.current?.emit('order:subscribe', { orderCode: code }),
+    'order:update': () => reload(),
   });
 
   if (loading) return <p>{t('common.loading')}</p>;

@@ -15,6 +15,8 @@ import Checkout from './pages/Checkout.jsx';
 import Orders from './pages/Orders.jsx';
 import OrderTrack from './pages/OrderTrack.jsx';
 import SandboxPay from './pages/SandboxPay.jsx';
+import Farmer from './pages/Farmer.jsx';
+import Rider from './pages/Rider.jsx';
 
 const stub = (name) => <Placeholder name={name} />;
 
@@ -81,6 +83,22 @@ export default function App() {
           element={<RequireRole roles={['hub_manager']}>{stub('Hub')}</RequireRole>}
         />
         <Route path="*" element={<p className="py-16 text-center">{t('notfound')}</p>} />
+        <Route
+          path={ROUTES.farmer}
+          element={
+            <RequireRole roles={['farmer']}>
+              <Farmer />
+            </RequireRole>
+          }
+        />
+        <Route
+          path={ROUTES.rider}
+          element={
+            <RequireRole roles={['rider']}>
+              <Rider />
+            </RequireRole>
+          }
+        />
       </Route>
     </Routes>
   );
