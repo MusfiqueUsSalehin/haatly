@@ -19,6 +19,7 @@ import { createAdminEarningsRouter } from './adminEarnings.js';
 
 import { createAdminJobsRouter } from './adminJobs.js';
 import { createJobStore } from '../jobs/jobStore.js';
+import { Hub } from '../models/Hub.js';
 
 export function createAdminRouter({ tokens, scheduler = null }) {
   const router = Router();
@@ -46,6 +47,10 @@ export function createAdminRouter({ tokens, scheduler = null }) {
 
   // Staff accounts (hub managers, admins) can only be created here, never by sign-up.
   router.post('/users', validate(createStaffSchema), async (req, res) => {
+    const { hubCode } = req.valid.body;
+    if (hubCode && !(await Hub.exists({ code: hubCode, active: true }))) {
+      throw new AppError(404, 'hub_not_found', 'Hub not found');
+    }
     const user = await createUser({ ...req.valid.body, status: USER_STATUS.ACTIVE });
     res.status(201).json({ user });
   });

@@ -4,10 +4,10 @@ import { hashPassword, verifyPassword } from '../utils/password.js';
 import { AppError } from '../utils/AppError.js';
 
 /** Create a user with an explicit status. Callers decide who may use this. */
-export async function createUser({ name, email, phone, password, role, status }) {
+export async function createUser({ name, email, phone, password, role, status, hubCode }) {
   const passwordHash = await hashPassword(password);
   try {
-    return await User.create({ name, email, phone, passwordHash, role, status });
+    return await User.create({ name, email, phone, passwordHash, role, status, hubCode });
   } catch (err) {
     if (err?.code === 11000) {
       throw new AppError(409, 'email_taken', 'An account with this email already exists');
