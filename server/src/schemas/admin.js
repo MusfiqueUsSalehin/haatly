@@ -1,14 +1,21 @@
 import { z } from 'zod';
 import { ROLES, STAFF_ROLES, STATUSES } from '../constants/roles.js';
 import { emailField, nameField, passwordField, phoneField } from './auth.js';
+import { CODE_PATTERN } from '../utils/codes.js';
 
-export const createStaffSchema = z.object({
-  name: nameField,
-  email: emailField,
-  phone: phoneField,
-  password: passwordField,
-  role: z.enum(STAFF_ROLES),
-});
+export const createStaffSchema = z
+  .object({
+    name: nameField,
+    email: emailField,
+    phone: phoneField,
+    password: passwordField,
+    role: z.enum(STAFF_ROLES),
+    hubCode: z.string().regex(CODE_PATTERN, 'must be a hub code like "savar"').optional(),
+  })
+  .refine((staff) => (staff.role === 'hub_manager') === Boolean(staff.hubCode), {
+    path: ['hubCode'],
+    message: 'is required for hub managers and not allowed for admins',
+  });
 
 export const setStatusSchema = z.object({
   status: z.enum(['active', 'suspended']),

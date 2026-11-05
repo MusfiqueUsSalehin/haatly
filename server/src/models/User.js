@@ -1,5 +1,6 @@
 import mongoose from 'mongoose';
 import { ROLES, STATUSES } from '../constants/roles.js';
+import { CODE_PATTERN } from '../utils/codes.js';
 
 const BD_MOBILE = /^\+8801[3-9]\d{8}$/;
 
@@ -18,11 +19,22 @@ const userSchema = new mongoose.Schema(
     status: { type: String, enum: STATUSES, required: true },
     // Set when an admin approves or suspends the account.
     statusReason: { type: String, trim: true, maxlength: 300 },
+    // Hub managers only: the one hub they run. Everything they can see is scoped to it.
+    hubCode: { type: String, trim: true, match: CODE_PATTERN },
     reviewedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     reviewedAt: { type: Date },
   },
   { timestamps: true },
 );
+
+userSchema.pre('validate', function () {
+  if (this.role === 'hub_manager' && !this.hubCode) {
+    this.invalidate('hubCode', 'a hub manager must be assigned a hub');
+  }
+  if (this.role !== 'hub_manager' && this.hubCode) {
+    this.invalidate('hubCode', 'only hub managers have a hub');
+  }
+});
 
 userSchema.index({ role: 1, status: 1 });
 

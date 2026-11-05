@@ -1,4 +1,5 @@
 // client/src/auth/RequireRole.jsx
+
 import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from './AuthContext.jsx';
 import { HOME_FOR_ROLE, ROUTES } from '../routes.js';

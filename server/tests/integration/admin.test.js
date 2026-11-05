@@ -4,6 +4,7 @@ import { makeTestApp } from '../helpers/testApp.js';
 import { clearTestDb, startTestDb, stopTestDb } from '../helpers/testDb.js';
 import { User } from '../../src/models/User.js';
 import { createUser } from '../../src/services/userService.js';
+import { seedCatalog } from '../../src/seed/catalog.js';
 
 const app = makeTestApp();
 const password = 'a-strong-password';
@@ -42,7 +43,11 @@ describe('admin access control', () => {
   });
 
   it.each(['customer', 'farmer', 'rider', 'hub_manager'])('forbids a %s', async (role) => {
-    await createUser({ ...person(1, role), status: 'active' });
+    await createUser({
+      ...person(1, role),
+      status: 'active',
+      ...(role === 'hub_manager' && { hubCode: 'savar' }),
+    });
     const token = await signIn('person1@example.com');
     const res = await request(app).get('/api/admin/users').set(as(token));
     expect(res.status).toBe(403);
@@ -134,12 +139,17 @@ describe('PATCH /api/admin/users/:id/status', () => {
 
 describe('POST /api/admin/users', () => {
   it('creates an active hub manager', async () => {
+    await seedCatalog();
     const res = await request(app)
       .post('/api/admin/users')
       .set(as(adminToken))
-      .send({ ...person(5, 'hub_manager'), phone: '01712345678' });
+      .send({ ...person(5, 'hub_manager'), phone: '01712345678', hubCode: 'savar' });
     expect(res.status).toBe(201);
-    expect(res.body.user).toMatchObject({ role: 'hub_manager', status: 'active' });
+    expect(res.body.user).toMatchObject({
+      role: 'hub_manager',
+      status: 'active',
+      hubCode: 'savar',
+    });
     expect(await signIn('person5@example.com')).toBeTypeOf('string');
   });
 
@@ -155,7 +165,25 @@ describe('POST /api/admin/users', () => {
     const res = await request(app)
       .post('/api/admin/users')
       .set(as(adminToken))
-      .send({ ...person(0, 'hub_manager'), phone: '01712345678' });
+      .send({ ...person(0, 'admin'), phone: '01712345678' });
     expect(res.status).toBe(409);
+  });
+
+  it('refuses a hub manager without a hub, or with an unknown one', async () => {
+    const send = (extra) =>
+      request(app)
+        .post('/api/admin/users')
+        .set(as(adminToken))
+        .send({ ...person(7, 'hub_manager'), phone: '01712345678', ...extra });
+    expect((await send({})).status).toBe(400);
+    expect((await send({ hubCode: 'nowhere' })).status).toBe(404);
+  });
+
+  it('refuses a hub on an admin', async () => {
+    const res = await request(app)
+      .post('/api/admin/users')
+      .set(as(adminToken))
+      .send({ ...person(8, 'admin'), phone: '01712345678', hubCode: 'savar' });
+    expect(res.status).toBe(400);
   });
 });
