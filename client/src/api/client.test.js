@@ -1,4 +1,6 @@
 // client/src/api/client.test.js
+
+// @vitest-environment jsdom
 import { afterEach, expect, it, vi } from 'vitest';
 import { ApiError, api, tokenStore } from './client.js';
 

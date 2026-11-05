@@ -1,4 +1,6 @@
 // client/src/auth/RequireRole.test.jsx
+
+// @vitest-environment jsdom
 import { render, screen } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { expect, it, vi } from 'vitest';
