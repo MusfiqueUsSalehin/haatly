@@ -75,13 +75,12 @@ describe('recipes through the gateway', () => {
       ),
     );
     expect(out.result.recipes.map((r) => r.title)).toEqual(['Good one']);
+    // A link in an extra removes only that extra; the recipe itself is still good.
     const www = await run(
-      reply(recipe({ extras: ['visit www.example.com'] }), recipe({ title: 'Ok' })),
+      reply(recipe({ extras: ['visit www.example.com', 'salt'] }), recipe({ title: 'Ok' })),
     );
-    const tomatoPotatoCurryRecipe = www.result.recipes.find(
-      (r) => r.title === 'Tomato potato curry',
-    );
-    expect(tomatoPotatoCurryRecipe.extras).toEqual(['onion', 'oil']);
+    const kept = www.result.recipes.find((r) => r.title === 'Tomato potato curry');
+    expect(kept.extras).toEqual(['salt']);
   });
 
   it('keeps at most three recipes', async () => {
