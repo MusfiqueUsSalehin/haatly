@@ -2,8 +2,8 @@
 import { useState } from 'react';
 import { useI18n } from '../i18n/I18nContext.jsx';
 
-export default function StopCard({ stop, canAct, onDeliver, onFail }) {
-  const { t, money } = useI18n();
+export default function StopCard({ stop, canAct, isNext, onDeliver, onFail }) {
+  const { t, pick, money } = useI18n();
   const [otp, setOtp] = useState('');
   const [reason, setReason] = useState('');
   const [error, setError] = useState('');
@@ -17,40 +17,63 @@ export default function StopCard({ stop, canAct, onDeliver, onFail }) {
     }
   }
 
+  const done = stop.status === 'delivered';
+  const dot = done
+    ? 'bg-leaf text-jute-light'
+    : stop.status === 'failed'
+      ? 'bg-chili text-jute-light'
+      : isNext
+        ? 'bg-turmeric text-jute-light'
+        : 'bg-jute text-soil-muted';
+
   return (
-    <li className="rounded-lg bg-surface p-3">
-      <div className="flex justify-between font-semibold">
-        <span>
-          {stop.sequence}. {stop.recipientName}
+    <li
+      className={`crate-card p-4 ${isNext ? '!border-turmeric/60' : ''} ${done ? 'opacity-75' : ''}`}
+    >
+      <div className="flex items-start gap-3">
+        <span
+          className={`grid h-9 w-9 shrink-0 place-items-center rounded-full font-semibold ${dot}`}
+        >
+          {stop.sequence}
         </span>
-        <span>{t(`stopstatus.${stop.status}`)}</span>
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center justify-between gap-2">
+            <p className="font-mono font-semibold">{stop.orderCode}</p>
+            {isNext && (
+              <span className="chip border border-turmeric/50 bg-turmeric/10 text-turmeric-deep">
+                {pick('এখন', 'Now')}
+              </span>
+            )}
+          </div>
+          <p className="text-sm">{stop.recipientName}</p>
+          <p className="text-sm text-soil-muted">
+            {stop.address?.line}
+            {stop.address?.landmark ? ` (${stop.address.landmark})` : ''}
+          </p>
+          {stop.collectBdt > 0 && (
+            <p className="mt-1 text-sm font-semibold text-chili">
+              {t('stop.collect')}: {money(stop.collectBdt)}
+            </p>
+          )}
+          {done && <p className="mt-1 text-sm text-leaf-dark">✓ {t('stopstatus.delivered')}</p>}
+          {stop.status === 'failed' && (
+            <p className="mt-1 text-sm text-chili">
+              {t('stopstatus.failed')}
+              {stop.failReason ? `: ${stop.failReason}` : ''}
+            </p>
+          )}
+        </div>
       </div>
-      <p className="text-sm">
-        {stop.address?.line}
-        {stop.address?.landmark ? ` (${stop.address.landmark})` : ''}
-      </p>
-      {stop.phone && (
-        <a className="text-sm text-crate" href={`tel:${stop.phone}`}>
-          {stop.phone}
-        </a>
-      )}
-      {stop.collectBdt > 0 && (
-        <p className="text-sm font-semibold text-chili">
-          {t('stop.collect')}: {money(stop.collectBdt)}
-        </p>
-      )}
-      {stop.status === 'failed' && stop.failReason && (
-        <p className="text-sm text-chili">{stop.failReason}</p>
-      )}
 
       {canAct && stop.status === 'pending' && (
-        <div className="mt-2 space-y-2">
+        <div className="mt-3 space-y-2">
           <div className="flex gap-2">
             <input
               className="input"
               inputMode="numeric"
               maxLength={6}
               placeholder={t('stop.otp')}
+              aria-label={t('stop.otp')}
               value={otp}
               onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
             />
@@ -66,11 +89,12 @@ export default function StopCard({ stop, canAct, onDeliver, onFail }) {
             <input
               className="input"
               placeholder={t('stop.reason')}
+              aria-label={t('stop.reason')}
               value={reason}
               onChange={(e) => setReason(e.target.value)}
             />
             <button
-              className="btn-ghost text-chili"
+              className="btn-ghost !border-chili/40 !text-chili"
               disabled={reason.trim().length < 2}
               onClick={() => go(() => onFail(stop.orderCode, reason.trim()))}
             >
