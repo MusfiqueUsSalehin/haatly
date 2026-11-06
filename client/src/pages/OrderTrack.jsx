@@ -8,6 +8,8 @@ import { useI18n } from '../i18n/I18nContext.jsx';
 import { useSocket } from '../realtime/useSocket.js';
 import { ROUTES } from '../routes.js';
 
+import RecipesPanel from '../components/RecipesPanel.jsx';
+
 const LIVE = ['placed', 'out_for_delivery'];
 
 export default function OrderTrack() {
@@ -162,6 +164,7 @@ export default function OrderTrack() {
           )}
         </section>
       </div>
+      {o.status !== 'cancelled' && <RecipesPanel order={o} />}
     </div>
   );
 }
