@@ -1,4 +1,4 @@
-// client/src/pages/admin/Approvals.jsx
+// client/src/pages/admin/Approvals.jsx  (replace)
 import { useState } from 'react';
 import { patch } from '../../api/client.js';
 import { useApi } from '../../api/useApi.js';
@@ -21,17 +21,26 @@ export default function Approvals() {
   }
 
   return (
-    <div className="space-y-2">
-      {users.length === 0 && <p>{t('admin.none')}</p>}
+    <div className="space-y-3">
+      {users.length === 0 && <p className="text-soil-muted">{t('admin.none')}</p>}
       {users.map((u) => (
-        <div key={u.id} className="flex flex-wrap items-center gap-3 rounded-lg bg-surface p-3">
-          <span className="flex-1">
-            {u.name} · {t(`role.${u.role}`)} · {u.email} · {u.phone}
+        <div key={u.id} className="crate-card flex flex-wrap items-center gap-3 p-4">
+          <div className="min-w-0 flex-1">
+            <p className="font-semibold">{u.name}</p>
+            <p className="text-sm text-soil-muted">
+              {u.email} · {u.phone}
+            </p>
+          </div>
+          <span className="chip border border-crate/40 bg-crate/10 text-crate">
+            {t(`role.${u.role}`)}
           </span>
           <button className="btn-primary" onClick={() => decide(u.id, 'active')}>
             {t('admin.approve')}
           </button>
-          <button className="btn-ghost text-chili" onClick={() => decide(u.id, 'suspended')}>
+          <button
+            className="btn-ghost !border-chili/40 !text-chili"
+            onClick={() => decide(u.id, 'suspended')}
+          >
             {t('admin.suspend')}
           </button>
         </div>
