@@ -29,7 +29,7 @@ export default function Login() {
   }
 
   return (
-    <form onSubmit={submit} className="mx-auto max-w-sm space-y-3">
+    <form onSubmit={submit} className="crate-card mx-auto max-w-md space-y-4 p-6">
       <h1 className="font-display text-3xl">{t('nav.login')}</h1>
       <input
         className="input"

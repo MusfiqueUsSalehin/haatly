@@ -27,7 +27,7 @@ function RiderRow({ user, profile, cities, onSaved }) {
   }
 
   return (
-    <div className="space-y-2 rounded-lg bg-white p-3">
+    <div className="space-y-2 rounded-lg bg-surface p-3">
       <p className="font-semibold">
         {user.name} · {user.phone}
       </p>
@@ -61,7 +61,7 @@ function RiderRow({ user, profile, cities, onSaved }) {
         {city?.zones.map((z) => (
           <label
             key={z.code}
-            className={`cursor-pointer rounded-full border px-3 py-1 text-sm ${zones.includes(z.code) ? 'border-leaf bg-leaf text-white' : 'border-soil/20'}`}
+            className={`cursor-pointer rounded-full border px-3 py-1 text-sm ${zones.includes(z.code) ? 'border-leaf bg-leaf text-jute-light' : 'border-jute-deep'}`}
           >
             <input
               type="checkbox"

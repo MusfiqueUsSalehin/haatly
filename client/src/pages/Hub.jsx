@@ -24,7 +24,7 @@ export default function Hub() {
       <h1 className="font-display text-3xl">
         {t('hub.title')}: {pick(hub.nameBn, hub.nameEn)}
       </h1>
-      <p className="text-soil/70">{t(`hub.${hub.kind}`)}</p>
+      <p className="text-soil-muted">{t(`hub.${hub.kind}`)}</p>
 
       {kind === 'collection' && (
         <>
@@ -32,7 +32,7 @@ export default function Hub() {
           {lots.data?.lots.length === 0 && <p>{t('lot.empty')}</p>}
           <ul className="space-y-2">
             {lots.data?.lots.map((l) => (
-              <li key={l.code} className="rounded-lg bg-white p-3 text-sm">
+              <li key={l.code} className="rounded-lg bg-surface p-3 text-sm">
                 <span className="font-semibold">{l.code}</span> · {l.produceSlug} ·{' '}
                 {t('triage.grade')} {l.grade} · {l.remainingKg}/{l.quantityKg} kg ·{' '}
                 {t(`lotstatus.${l.status}`)} · {l.hoursToExpiry}h
@@ -48,7 +48,7 @@ export default function Hub() {
           {runs.data?.runs.length === 0 && <p>{t('admin.none')}</p>}
           <ul className="space-y-2">
             {runs.data?.runs.map((r) => (
-              <li key={r.code} className="rounded-lg bg-white p-3 text-sm">
+              <li key={r.code} className="rounded-lg bg-surface p-3 text-sm">
                 {r.code} · {t(`runstatus.${r.status}`)} · {r.stops.length} stops · {r.distanceKm} km
               </li>
             ))}

@@ -145,7 +145,7 @@ export default function Checkout() {
         <option value="cod">{t('pay.cod')}</option>
         <option value="wallet">{t('pay.wallet')}</option>
       </select>
-      <div className="rounded-lg bg-white p-3 text-sm">
+      <div className="rounded-lg bg-surface p-3 text-sm">
         <p>
           {t('checkout.subtotal')}: {money(subtotalBdt)}
         </p>

@@ -20,7 +20,7 @@ function Row({ farmer, onPaid }) {
   }
 
   return (
-    <div className="flex flex-wrap items-center gap-3 rounded-lg bg-white p-3">
+    <div className="flex flex-wrap items-center gap-3 rounded-lg bg-surface p-3">
       <span className="flex-1">
         {farmer.name} · {farmer.phone} · {t('admin.owed')} {money(farmer.unpaidBdt)}
       </span>

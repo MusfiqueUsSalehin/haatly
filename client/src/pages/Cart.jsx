@@ -34,7 +34,7 @@ export default function Cart() {
   return (
     <section className="max-w-xl">
       <h1 className="mb-4 font-display text-3xl">{t('cart.title')}</h1>
-      <ul className="divide-y divide-soil/10 rounded-lg bg-white">
+      <ul className="divide-y divide-jute-deep rounded-lg bg-surface">
         {items.map((i) => (
           <li key={i.boxCode} className="flex items-center gap-3 px-3 py-3">
             <span className="flex-1 capitalize">

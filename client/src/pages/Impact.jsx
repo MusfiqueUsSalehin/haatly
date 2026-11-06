@@ -31,13 +31,13 @@ export default function Impact() {
       <p>{t('impact.sub')}</p>
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
         {cards.map(([k, v]) => (
-          <div key={k} className="rounded-xl bg-white p-4">
+          <div key={k} className="rounded-xl bg-surface p-4">
             <p className="text-3xl font-semibold text-leaf">{v}</p>
-            <p className="text-sm text-soil/70">{t(k)}</p>
+            <p className="text-sm text-soil-muted">{t(k)}</p>
           </div>
         ))}
       </div>
-      <p className="text-sm text-soil/60">{t('impact.note')}</p>
+      <p className="text-sm text-soil-muted">{t('impact.note')}</p>
       <details className="mx-auto max-w-md text-left text-sm">
         <summary className="cursor-pointer">{t('impact.assumptions')}</summary>
         <ul className="mt-2 space-y-1">

@@ -56,7 +56,7 @@ export default function OrderTrack() {
       </p>
 
       {o.deliveryOtp && (
-        <div className="rounded-lg border-2 border-turmeric bg-white p-4 text-center">
+        <div className="rounded-lg border-2 border-turmeric bg-surface p-4 text-center">
           <p className="text-sm">{t('order.otpHelp')}</p>
           <p className="mt-1 font-mono text-4xl tracking-widest">{o.deliveryOtp}</p>
         </div>
@@ -68,7 +68,7 @@ export default function OrderTrack() {
           {o.statusHistory.map((h) => (
             <li key={`${h.status}-${h.at}`}>
               {t(`status.${h.status}`)} ·{' '}
-              <time className="text-sm text-soil/60">{new Date(h.at).toLocaleString()}</time>
+              <time className="text-sm text-soil-muted">{new Date(h.at).toLocaleString()}</time>
             </li>
           ))}
         </ol>

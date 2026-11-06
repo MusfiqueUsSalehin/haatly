@@ -3,22 +3,115 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
-  body {
-    @apply bg-jute/30 font-body text-soil antialiased;
+/* Values are raw "R G B" triplets so slash-opacity (bg-leaf/10) keeps working. */
+:root,
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --c-jute-light: 25 20 16;
+  --c-jute: 44 36 27;
+  --c-jute-deep: 61 50 38;
+  --c-surface: 34 27 20;
+  --c-sunken: 20 16 12;
+  --c-soil: 235 226 207;
+  --c-soil-muted: 162 149 126;
+  --c-leaf: 94 156 110;
+  --c-leaf-dark: 143 199 158;
+  --c-leaf-light: 127 185 139;
+  --c-turmeric: 232 178 74;
+  --c-turmeric-deep: 240 197 114;
+  --c-crate: 74 155 209;
+  --c-crate-light: 22 36 46;
+  --c-chili: 224 104 90;
+  --weave: 235 226 207;
+  --weave-alpha: 0.03;
+  --shadow-crate: 0 1px 0 0 rgb(var(--c-jute-deep)), 0 10px 26px -16px rgb(0 0 0 / 0.75);
+  --shadow-lift: 0 18px 44px -24px rgb(0 0 0 / 0.85);
+}
+
+:root[data-theme='light'] {
+  color-scheme: light;
+  --c-jute-light: 243 238 224;
+  --c-jute: 232 223 200;
+  --c-jute-deep: 217 205 174;
+  --c-surface: 255 255 255;
+  --c-sunken: 255 255 255;
+  --c-soil: 58 46 35;
+  --c-soil-muted: 110 97 82;
+  --c-leaf: 47 93 58;
+  --c-leaf-dark: 30 62 38;
+  --c-leaf-light: 76 129 89;
+  --c-turmeric: 224 164 46;
+  --c-turmeric-deep: 194 135 26;
+  --c-crate: 29 111 163;
+  --c-crate-light: 227 240 248;
+  --c-chili: 192 57 43;
+  --weave: 58 46 35;
+  --weave-alpha: 0.035;
+  --shadow-crate: 0 2px 0 0 rgb(var(--c-jute-deep)), 0 8px 22px -14px rgb(58 46 35 / 0.45);
+  --shadow-lift: 0 16px 40px -22px rgb(58 46 35 / 0.5);
+}
+
+body {
+  @apply bg-jute-light font-sans text-soil antialiased;
+  /* A faint jute weave so the page reads as sacking, not a blank canvas. */
+  background-image:
+    repeating-linear-gradient(
+      90deg,
+      rgb(var(--weave) / var(--weave-alpha)) 0 1px,
+      transparent 1px 7px
+    ),
+    repeating-linear-gradient(
+      0deg,
+      rgb(var(--weave) / calc(var(--weave-alpha) * 0.85)) 0 1px,
+      transparent 1px 7px
+    );
+  background-attachment: fixed;
+}
+
+*:focus-visible {
+  outline: 3px solid rgb(var(--c-crate));
+  outline-offset: 2px;
+}
+::selection {
+  background: rgb(var(--c-leaf) / 0.35);
+}
+* {
+  scrollbar-color: rgb(var(--c-jute-deep)) transparent;
+  scrollbar-width: thin;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
   }
 }
+
 @layer components {
+  .crate-card {
+    @apply rounded-crate border border-jute-deep bg-surface shadow-crate;
+  }
   .btn {
-    @apply inline-flex items-center justify-center rounded-lg px-4 py-2 font-semibold transition disabled:opacity-50;
+    @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2.5 font-semibold transition-colors disabled:cursor-not-allowed disabled:opacity-50;
   }
   .btn-primary {
-    @apply btn bg-leaf text-white hover:bg-leaf-dark;
+    @apply btn bg-leaf text-jute-light hover:bg-leaf-dark;
   }
   .btn-ghost {
-    @apply btn border border-soil/20 hover:bg-soil/5;
+    @apply btn border border-leaf/35 text-leaf-dark hover:bg-leaf/10;
+  }
+  .btn-warn {
+    @apply btn bg-turmeric text-jute-light hover:bg-turmeric-deep;
   }
   .input {
-    @apply w-full rounded-lg border border-soil/20 bg-white px-3 py-2 focus:border-leaf focus:outline-none;
+    @apply w-full rounded-lg border border-jute-deep bg-sunken px-3 py-2.5 text-soil placeholder:text-soil-muted/60 focus:border-leaf;
+  }
+  .label {
+    @apply mb-1.5 block text-sm font-semibold text-soil;
+  }
+  .chip {
+    @apply inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold;
   }
 }

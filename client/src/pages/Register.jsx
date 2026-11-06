@@ -54,7 +54,7 @@ export default function Register() {
   );
 
   return (
-    <form onSubmit={submit} className="mx-auto max-w-sm space-y-3">
+    <form onSubmit={submit} className="crate-card mx-auto max-w-md space-y-4 p-6">
       <h1 className="font-display text-3xl">{t('nav.register')}</h1>
       {field('name', t('auth.name'))}
       {field('email', t('auth.email'), { type: 'email' })}

@@ -24,7 +24,7 @@ export default function Orders() {
           <li key={o.code}>
             <Link
               to={path('order', { code: o.code })}
-              className="flex justify-between rounded-lg bg-white px-3 py-3 hover:bg-white/70"
+              className="flex justify-between rounded-lg bg-surface px-3 py-3 hover:bg-jute"
             >
               <span>{o.code}</span>
               <span>

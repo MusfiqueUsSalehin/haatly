@@ -24,7 +24,7 @@ export default function Approvals() {
     <div className="space-y-2">
       {users.length === 0 && <p>{t('admin.none')}</p>}
       {users.map((u) => (
-        <div key={u.id} className="flex flex-wrap items-center gap-3 rounded-lg bg-white p-3">
+        <div key={u.id} className="flex flex-wrap items-center gap-3 rounded-lg bg-surface p-3">
           <span className="flex-1">
             {u.name} · {t(`role.${u.role}`)} · {u.email} · {u.phone}
           </span>

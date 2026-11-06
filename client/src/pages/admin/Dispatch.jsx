@@ -53,7 +53,7 @@ export default function Dispatch() {
         {runs.data?.runs.length === 0 && <p>{t('admin.none')}</p>}
         <ul className="space-y-1">
           {runs.data?.runs.map((r) => (
-            <li key={r.code} className="rounded-lg bg-white p-2 text-sm">
+            <li key={r.code} className="rounded-lg bg-surface p-2 text-sm">
               {r.code} · {r.cityCode} · {t(`runstatus.${r.status}`)} · {r.stops.length} stops ·{' '}
               {r.distanceKm} km
             </li>
@@ -66,7 +66,7 @@ export default function Dispatch() {
         {jobs.data && !jobs.data.schedulerRunsHere && <p>{t('admin.noScheduler')}</p>}
         <ul className="space-y-1">
           {jobs.data?.jobs.map((j) => (
-            <li key={j.name} className="rounded-lg bg-white p-2 text-sm">
+            <li key={j.name} className="rounded-lg bg-surface p-2 text-sm">
               {j.name} · {j.schedule} · {j.lastStatus ?? '-'}
               {j.lastFinishedAt ? ` · ${new Date(j.lastFinishedAt).toLocaleString()}` : ''}
               {j.lastError ? ` · ${j.lastError}` : ''}

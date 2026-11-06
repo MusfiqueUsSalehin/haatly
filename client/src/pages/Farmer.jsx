@@ -27,8 +27,8 @@ export default function Farmer() {
             ['earn.paid', money(s.paidBdt)],
             ['earn.kg', s.kg],
           ].map(([k, v]) => (
-            <div key={k} className="rounded-xl bg-white p-3">
-              <p className="text-sm text-soil/60">{t(k)}</p>
+            <div key={k} className="rounded-xl bg-surface p-3">
+              <p className="text-sm text-soil-muted">{t(k)}</p>
               <p className="text-xl font-semibold">{v}</p>
             </div>
           ))}
@@ -47,7 +47,7 @@ export default function Farmer() {
           {lots.data?.lots.length === 0 && <p>{t('lot.empty')}</p>}
           <ul className="space-y-2">
             {lots.data?.lots.map((l) => (
-              <li key={l.code} className="rounded-lg bg-white p-3 text-sm">
+              <li key={l.code} className="rounded-lg bg-surface p-3 text-sm">
                 <div className="flex justify-between font-semibold">
                   <span>
                     {l.code} · {l.produceSlug} · {t('triage.grade')} {l.grade}

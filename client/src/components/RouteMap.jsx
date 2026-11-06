@@ -11,7 +11,7 @@ export default function RouteMap({ stops, centers, rider, label }) {
   const seen = {};
 
   return (
-    <svg viewBox="0 0 320 240" role="img" aria-label={label} className="w-full rounded-lg bg-white">
+    <svg viewBox="0 0 320 240" role="img" aria-label={label} className="w-full rounded-lg bg-surface">
       <polyline
         fill="none"
         stroke="#1D6FA3"

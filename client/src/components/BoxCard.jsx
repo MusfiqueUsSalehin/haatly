@@ -8,7 +8,7 @@ export default function BoxCard({ box, cityCode }) {
   const { t, money } = useI18n();
   const { dispatch } = useCart();
   return (
-    <article className="rounded-xl border border-soil/10 bg-white p-4">
+    <article className="rounded-xl border border-jute-deep bg-surface p-4">
       <Link
         to={path('box', { code: box.code })}
         className="font-display text-2xl capitalize text-leaf"
@@ -21,7 +21,7 @@ export default function BoxCard({ box, cityCode }) {
         <>
           <p className="mt-2 text-xl font-semibold">
             {money(box.priceBdt)}{' '}
-            <s className="text-sm font-normal text-soil/50">{money(box.bazarValueBdt)}</s>
+            <s className="text-sm font-normal text-soil-muted">{money(box.bazarValueBdt)}</s>
           </p>
           <p className="text-sm text-leaf">
             {box.savingsPct}% {t('box.save')} · {box.unitsAvailable}

@@ -25,7 +25,7 @@ export default function BoxDetail() {
         {box.tier} · {box.weightKg} kg
       </h1>
       <h2 className="mt-4 font-semibold">{t('box.contents')}</h2>
-      <ul className="mt-2 divide-y divide-soil/10 rounded-lg bg-white">
+      <ul className="mt-2 divide-y divide-jute-deep rounded-lg bg-surface">
         {box.lines.map((l) => (
           <li key={l.produceSlug} className="flex justify-between px-3 py-2">
             <span>{pick(l.nameBn, l.nameEn)}</span>
@@ -39,7 +39,7 @@ export default function BoxDetail() {
         <>
           <p className="mt-4 text-2xl font-semibold">
             {money(box.priceBdt)}{' '}
-            <s className="text-base font-normal text-soil/50">{money(box.bazarValueBdt)}</s>
+            <s className="text-base font-normal text-soil-muted">{money(box.bazarValueBdt)}</s>
           </p>
           <button
             className="btn-primary mt-3"

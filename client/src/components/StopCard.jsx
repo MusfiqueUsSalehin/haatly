@@ -18,7 +18,7 @@ export default function StopCard({ stop, canAct, onDeliver, onFail }) {
   }
 
   return (
-    <li className="rounded-lg bg-white p-3">
+    <li className="rounded-lg bg-surface p-3">
       <div className="flex justify-between font-semibold">
         <span>
           {stop.sequence}. {stop.recipientName}
