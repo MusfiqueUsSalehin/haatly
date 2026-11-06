@@ -21,6 +21,8 @@ import { createAdminJobsRouter } from './adminJobs.js';
 import { createJobStore } from '../jobs/jobStore.js';
 import { Hub } from '../models/Hub.js';
 
+import { createAdminOverviewRouter } from './adminOverview.js';
+
 export function createAdminRouter({ tokens, scheduler = null }) {
   const router = Router();
 
@@ -30,6 +32,7 @@ export function createAdminRouter({ tokens, scheduler = null }) {
   router.use('/earnings', createAdminEarningsRouter());
   router.use('/jobs', createAdminJobsRouter({ scheduler, store: createJobStore() }));
   router.use(createAdminDispatchRouter());
+  router.use(createAdminOverviewRouter());
 
   // Filters use exact matches only, so there is no free-text search to inject into.
   router.get('/users', validate(listUsersQuery, 'query'), async (req, res) => {
