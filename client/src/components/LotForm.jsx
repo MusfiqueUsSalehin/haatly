@@ -23,6 +23,13 @@ const DEFECTS = [
   'slime',
 ];
 
+const Tile = ({ label, value, color }) => (
+  <div className="rounded-lg bg-sunken p-3 text-center">
+    <p className="text-xs text-soil-muted">{label}</p>
+    <p className={`font-display text-3xl ${color}`}>{value}</p>
+  </div>
+);
+
 export default function LotForm({ onCreated }) {
   const { t, pick, money } = useI18n();
   const produce = useApi('/catalog/produce');
@@ -84,57 +91,77 @@ export default function LotForm({ onCreated }) {
   const ready = form.produceSlug && form.hubCode && Number(form.quantityKg) >= 1;
 
   return (
-    <form onSubmit={check} className="space-y-3 rounded-xl bg-surface p-4">
-      <h2 className="font-display text-2xl">{t('lot.new')}</h2>
-      <select
-        className="input"
-        required
-        value={form.produceSlug}
-        aria-label={t('lot.produce')}
-        onChange={(e) => {
-          set('produceSlug')(e);
-          stale();
-        }}
-      >
-        <option value="">{t('lot.produce')}</option>
-        {produce.data?.produce.map((p) => (
-          <option key={p.slug} value={p.slug}>
-            {pick(p.nameBn, p.nameEn)}
-          </option>
-        ))}
-      </select>
-      <select
-        className="input"
-        required
-        value={form.hubCode}
-        onChange={set('hubCode')}
-        aria-label={t('lot.hub')}
-      >
-        <option value="">{t('lot.hub')}</option>
-        {hubs.data?.hubs.map((h) => (
-          <option key={h.code} value={h.code}>
-            {pick(h.nameBn, h.nameEn)}
-          </option>
-        ))}
-      </select>
-      <input
-        className="input"
-        type="number"
-        min="1"
-        max="5000"
-        required
-        placeholder={t('lot.qty')}
-        value={form.quantityKg}
-        onChange={set('quantityKg')}
-      />
+    <form onSubmit={check} className="crate-card space-y-4 p-5">
+      <div>
+        <h2 className="font-display text-2xl">{t('lot.new')}</h2>
+        <p className="text-sm text-soil-muted">
+          {pick(
+            'ফসল আর ত্রুটি জানান, ছবি দিলে আরও ভালো; গ্রেড আর টিকে থাকার সময় ঠিক হবে।',
+            'Tell us the produce and any defects (a photo helps); we set the grade and shelf life.',
+          )}
+        </p>
+      </div>
+
+      <div className="grid gap-4 sm:grid-cols-2">
+        <div>
+          <label className="label" htmlFor="lp">
+            {t('lot.produce')}
+          </label>
+          <select
+            id="lp"
+            className="input"
+            required
+            value={form.produceSlug}
+            onChange={(e) => {
+              set('produceSlug')(e);
+              stale();
+            }}
+          >
+            <option value="" />
+            {produce.data?.produce.map((p) => (
+              <option key={p.slug} value={p.slug}>
+                {pick(p.nameBn, p.nameEn)}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <label className="label" htmlFor="lq">
+            {t('lot.qty')}
+          </label>
+          <input
+            id="lq"
+            className="input"
+            type="number"
+            min="1"
+            max="5000"
+            required
+            value={form.quantityKg}
+            onChange={set('quantityKg')}
+          />
+        </div>
+      </div>
+      <div>
+        <label className="label" htmlFor="lh">
+          {t('lot.hub')}
+        </label>
+        <select id="lh" className="input" required value={form.hubCode} onChange={set('hubCode')}>
+          <option value="" />
+          {hubs.data?.hubs.map((h) => (
+            <option key={h.code} value={h.code}>
+              {pick(h.nameBn, h.nameEn)}
+            </option>
+          ))}
+        </select>
+      </div>
 
       <fieldset>
-        <legend className="mb-1 text-sm font-semibold">{t('lot.defects')}</legend>
+        <legend className="label">{t('lot.defects')}</legend>
         <div className="flex flex-wrap gap-2">
           {DEFECTS.map((d) => (
             <label
               key={d}
-              className={`cursor-pointer rounded-full border px-3 py-1 text-sm ${defects.includes(d) ? 'border-leaf bg-leaf text-jute-light' : 'border-jute-deep'}`}
+              className={`chip cursor-pointer border px-3 py-1.5 ${defects.includes(d) ? 'border-leaf bg-leaf text-jute-light' : 'border-jute-deep text-soil-muted'}`}
             >
               <input
                 type="checkbox"
@@ -148,13 +175,13 @@ export default function LotForm({ onCreated }) {
         </div>
       </fieldset>
 
-      <label className="block text-sm">
-        {t('lot.photo')}
+      <label className="block rounded-lg border border-dashed border-jute-deep p-3 text-sm">
+        <span className="font-semibold">{t('lot.photo')}</span>
         <input
           type="file"
           accept="image/*"
           capture="environment"
-          className="mt-1 block"
+          className="mt-1 block w-full text-soil-muted"
           onChange={async (e) => {
             const file = e.target.files?.[0];
             setPhoto(file ? await photoToPayload(file).catch(() => null) : null);
@@ -168,13 +195,22 @@ export default function LotForm({ onCreated }) {
       </button>
 
       {triage && (
-        <div className="rounded-lg border border-jute-deep p-3">
-          <p className="text-lg font-semibold">
-            {triage.sellable
-              ? `${t('triage.grade')} ${triage.grade} · ${triage.shelfLifeDays} ${t('triage.days')}`
-              : t('triage.unsafe')}
-          </p>
-          <p className="text-sm text-soil-muted">
+        <div
+          className={`rounded-crate border p-4 ${triage.sellable ? 'border-leaf/50 bg-leaf/10' : 'border-chili/50 bg-chili/10'}`}
+        >
+          {triage.sellable ? (
+            <div className="grid grid-cols-2 gap-3">
+              <Tile label={t('triage.grade')} value={triage.grade} color="text-leaf-dark" />
+              <Tile
+                label={pick('টিকবে', 'Stays fresh')}
+                value={`${triage.shelfLifeDays} ${t('triage.days')}`}
+                color="text-turmeric-deep"
+              />
+            </div>
+          ) : (
+            <p className="font-display text-2xl text-chili">{t('triage.unsafe')}</p>
+          )}
+          <p className="mt-3 text-sm text-soil-muted">
             {triage.notes.map((n) => t(`triage.${n}`)).join(' · ')}
           </p>
           {triage.defects.length > 0 && (
@@ -194,10 +230,15 @@ export default function LotForm({ onCreated }) {
       )}
 
       {created && (
-        <p className="rounded-lg bg-leaf/10 p-3 text-sm">
-          {t('lot.created')}: {created.code} · {t('lot.price')} {money(created.priceBdt)} ·{' '}
-          {t('lot.floor')} {money(created.farmerFloorBdt)}
-        </p>
+        <div className="rounded-lg border border-leaf/40 bg-leaf/10 p-3 text-sm">
+          <p className="font-semibold text-leaf-dark">
+            {t('lot.created')}: <span className="font-mono">{created.code}</span>
+          </p>
+          <p>
+            {t('lot.price')} {money(created.priceBdt)} · {t('lot.floor')}{' '}
+            {money(created.farmerFloorBdt)}
+          </p>
+        </div>
       )}
       {error && (
         <p role="alert" className="text-chili">
