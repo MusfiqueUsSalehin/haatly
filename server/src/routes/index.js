@@ -43,7 +43,8 @@ export function createApiRouter({ env, tokens, ai, payments, scheduler = null })
   router.use('/forecast', createForecastRouter({ tokens }));
   router.use('/recipes', createRecipesRouter({ tokens, ai }));
   router.use('/hub', createHubRouter({ tokens }));
-  router.use('/admin', createAdminRouter({ tokens, scheduler }));
+  router.use('/admin', createAdminRouter({ tokens, scheduler, env }));
+  router.use('/impact', createImpactRouter({ tokens, ai }));
 
   return router;
 }
