@@ -54,7 +54,7 @@ export default function Staff() {
   );
 
   return (
-    <form onSubmit={submit} className="max-w-sm space-y-3">
+    <form onSubmit={submit} className="crate-card max-w-md space-y-3 p-5">
       {input('name', 'Name')}
       {input('email', 'Email', { type: 'email' })}
       {input('phone', 'Mobile', { inputMode: 'tel' })}

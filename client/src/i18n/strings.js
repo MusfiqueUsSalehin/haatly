@@ -163,6 +163,7 @@ export const strings = {
     'impact.earned': 'কৃষকের মোট আয়',
     'impact.note': 'এই সংখ্যাগুলো অনুমান-ভিত্তিক হিসাব',
     'impact.assumptions': 'হিসাবের ধরন',
+    'admin.overview': 'ওভারভিউ',
   },
   en: {
     'app.name': 'Haatly',
@@ -327,5 +328,6 @@ export const strings = {
     'impact.earned': 'Paid to farmers',
     'impact.note': 'These figures are estimates',
     'impact.assumptions': 'How we estimate',
+    'admin.overview': 'Overview',
   },
 };
