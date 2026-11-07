@@ -1,4 +1,6 @@
 // client/src/api/client.js
+// Empty in development (the Vite proxy handles /api). In production: the API's origin.
+const API_ORIGIN = (import.meta.env.VITE_API_URL ?? '').replace(/\/$/, '');
 const TOKEN_KEY = 'haatly.token';
 
 export const tokenStore = {
@@ -29,7 +31,7 @@ export async function api(path, { method = 'GET', body, auth = true } = {}) {
 
   let res;
   try {
-    res = await fetch(`/api${path}`, {
+    res = await fetch(`${API_ORIGIN}/api${path}`, {
       method,
       headers,
       body: body !== undefined ? JSON.stringify(body) : undefined,
