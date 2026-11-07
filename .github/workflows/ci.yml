@@ -23,7 +23,12 @@ jobs:
         with:
           node-version-file: .nvmrc
           cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            client/package-lock.json
       - run: npm ci
+      - run: npm ci
+        working-directory: client
       - run: npm run lint
       - run: npm run format:check
 
@@ -58,3 +63,10 @@ jobs:
         working-directory: client
       - run: npm run build
         working-directory: client
+  docker:
+    name: Docker images build
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v6
+      - run: docker build ./server -t haatly-server
+      - run: docker build ./client -t haatly-client
