@@ -38,3 +38,10 @@ Every AI feature goes through one gateway (`server/src/services/ai/gateway.js`).
 Every call writes an `AiLog` row (who answered, fallback reason, latency, tokens). Rows
 delete themselves after 90 days. `provider_off` is also logged when a feature has nothing
 for the model to look at, such as triage without a photo.
+
+## Turning the AI on
+
+Set `AI_PROVIDER=anthropic` and `ANTHROPIC_API_KEY` in `server/.env` (or the root `.env` for Docker).
+`AI_MAX_CALLS_PER_DAY` is a hard cap; past it, or on any failure, features answer from their rules.
+Features using the model: photo grading (only when a photo is attached), recipe suggestions,
+and the impact summary (wording cached for 6 hours). Admins see per-feature health under Admin → AI.
