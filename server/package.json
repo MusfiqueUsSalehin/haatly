@@ -1,6 +1,6 @@
 {
   "name": "haatly-server",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "private": true,
   "type": "module",
   "description": "Haatly API server",
