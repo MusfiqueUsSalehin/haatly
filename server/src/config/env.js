@@ -87,10 +87,7 @@ const schema = z
     path: ['ANTHROPIC_API_KEY'],
     message: 'is required when AI_PROVIDER is anthropic',
   })
-  .refine((env) => env.AI_PROVIDER !== 'anthropic' || Boolean(env.ANTHROPIC_API_KEY), {
-    path: ['ANTHROPIC_API_KEY'],
-    message: 'is required when AI_PROVIDER is anthropic',
-  })
+
   .refine((env) => !(env.NODE_ENV === 'production' && env.PAYMENT_PROVIDER === 'sandbox'), {
     path: ['PAYMENT_PROVIDER'],
     message: 'the sandbox payment provider cannot be used in production',
