@@ -3,12 +3,14 @@ import { useApi } from '../api/useApi.js';
 import { useAuth } from '../auth/AuthContext.jsx';
 import StatCard from '../components/StatCard.jsx';
 import { useI18n } from '../i18n/I18nContext.jsx';
+import AiBadge from '../components/AiBadge.jsx';
 
 export default function Impact() {
   const { t, pick, money, lang } = useI18n();
   const { user } = useAuth();
   const network = useApi('/impact');
   const mine = useApi(user?.role === 'customer' ? '/impact/me' : null);
+  const summary = useApi(user?.role === 'customer' ? '/impact/me/summary' : null);
 
   if (network.loading) return <p>{t('common.loading')}</p>;
   if (network.error)
@@ -26,6 +28,12 @@ export default function Impact() {
   return (
     <section className="space-y-8">
       <div>
+        {summary.data?.summary && (
+          <div className="crate-card flex items-start gap-3 p-5">
+            <p className="flex-1 leading-relaxed">{summary.data.summary[lang]}</p>
+            <AiBadge source={summary.data.source} />
+          </div>
+        )}
         <p className="text-xs font-semibold tracking-wide text-turmeric-deep">
           {me ? pick('আপনার হিসাব', 'Your numbers') : pick('হাটলির হিসাব', 'The network')}
         </p>

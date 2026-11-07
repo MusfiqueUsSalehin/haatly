@@ -22,8 +22,9 @@ import { createJobStore } from '../jobs/jobStore.js';
 import { Hub } from '../models/Hub.js';
 
 import { createAdminOverviewRouter } from './adminOverview.js';
+import { createAdminAiRouter } from './adminAi.js';
 
-export function createAdminRouter({ tokens, scheduler = null }) {
+export function createAdminRouter({ tokens, env, scheduler = null }) {
   const router = Router();
 
   router.use(authenticate(tokens), requireRole('admin'));
@@ -33,6 +34,7 @@ export function createAdminRouter({ tokens, scheduler = null }) {
   router.use('/jobs', createAdminJobsRouter({ scheduler, store: createJobStore() }));
   router.use(createAdminDispatchRouter());
   router.use(createAdminOverviewRouter());
+  router.use(createAdminAiRouter({ env }));
 
   // Filters use exact matches only, so there is no free-text search to inject into.
   router.get('/users', validate(listUsersQuery, 'query'), async (req, res) => {
