@@ -164,6 +164,7 @@ export const strings = {
     'impact.note': 'এই সংখ্যাগুলো অনুমান-ভিত্তিক হিসাব',
     'impact.assumptions': 'হিসাবের ধরন',
     'admin.overview': 'ওভারভিউ',
+    'admin.ai': 'এআই',
   },
   en: {
     'app.name': 'Haatly',
@@ -329,5 +330,6 @@ export const strings = {
     'impact.note': 'These figures are estimates',
     'impact.assumptions': 'How we estimate',
     'admin.overview': 'Overview',
+    'admin.ai': 'AI',
   },
 };

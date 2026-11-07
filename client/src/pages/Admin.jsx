@@ -8,8 +8,9 @@ import Overview from './admin/Overview.jsx';
 import Payouts from './admin/Payouts.jsx';
 import Riders from './admin/Riders.jsx';
 import Staff from './admin/Staff.jsx';
+import AiHealth from './admin/AiHealth.jsx';
 
-const TABS = ['overview', 'approvals', 'riders', 'dispatch', 'payouts', 'staff'];
+const TABS = ['overview', 'approvals', 'riders', 'dispatch', 'payouts', 'staff', 'ai'];
 
 export default function Admin() {
   const { t, pick } = useI18n();
@@ -24,6 +25,7 @@ export default function Admin() {
     dispatch: <Dispatch />,
     payouts: <Payouts />,
     staff: <Staff />,
+    ai: <AiHealth />,
   };
 
   return (
