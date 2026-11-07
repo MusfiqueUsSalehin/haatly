@@ -2,12 +2,14 @@
 import { useState } from 'react';
 import { post } from '../api/client.js';
 import { useI18n } from '../i18n/I18nContext.jsx';
+import AiBadge from './AiBadge.jsx';
 
 export default function RecipesPanel({ order }) {
   const { pick, lang } = useI18n();
   const [recipes, setRecipes] = useState(null);
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
+  const [source, setSource] = useState(null);
 
   const slugs = [
     ...new Set((order.items ?? []).flatMap((i) => (i.lines ?? []).map((l) => l.produceSlug))),
@@ -20,6 +22,7 @@ export default function RecipesPanel({ order }) {
     try {
       const res = await post('/recipes', { produceSlugs: slugs, language: lang });
       setRecipes(res.recipes ?? []);
+      setSource(res.source);
     } catch (err) {
       setError(err.message);
     } finally {
@@ -32,7 +35,7 @@ export default function RecipesPanel({ order }) {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <p className="text-xs font-semibold tracking-wide text-turmeric-deep">
-            {pick('রান্না বন্ধু', 'Cook with it')}
+            {pick('রান্না বন্ধু', 'Cook with it')} <AiBadge source={source} />
           </p>
           <h2 className="font-display text-2xl">
             {pick('যা আসছে, তা দিয়ে আজ রাতে', 'Tonight, with what’s coming')}

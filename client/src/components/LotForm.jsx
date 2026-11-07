@@ -4,6 +4,7 @@ import { post } from '../api/client.js';
 import { useApi } from '../api/useApi.js';
 import { useI18n } from '../i18n/I18nContext.jsx';
 import { photoToPayload } from '../lib/photo.js';
+import AiBadge from './AiBadge.jsx';
 
 // Same list as the server's DEFECT_NAMES: the server rejects anything else.
 const DEFECTS = [
@@ -41,6 +42,7 @@ export default function LotForm({ onCreated }) {
   const [created, setCreated] = useState(null);
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
+  const [source, setSource] = useState(null);
   const set = (k) => (e) => setForm({ ...form, [k]: e.target.value });
 
   // Any change makes an earlier grade result stale.
@@ -73,7 +75,11 @@ export default function LotForm({ onCreated }) {
 
   const check = (e) => {
     e.preventDefault();
-    return run(async () => setTriage((await post('/ai/triage', body())).triage));
+    return run(async () => {
+      const res = await post('/ai/triage', body());
+      setTriage(res.triage);
+      setSource(res.source);
+    });
   };
 
   const submit = () =>
@@ -198,6 +204,19 @@ export default function LotForm({ onCreated }) {
         <div
           className={`rounded-crate border p-4 ${triage.sellable ? 'border-leaf/50 bg-leaf/10' : 'border-chili/50 bg-chili/10'}`}
         >
+          <div className="mb-2 flex items-center justify-between gap-2">
+            {photo && source === 'rules' ? (
+              <p className="text-xs text-soil-muted">
+                {pick(
+                  'ছবি এআই দিয়ে যাচাই হয়নি; আপনার টিক করা ত্রুটি দিয়ে গ্রেড হয়েছে।',
+                  'The photo was not AI-checked; the grade uses the defects you ticked.',
+                )}
+              </p>
+            ) : (
+              <span />
+            )}
+            <AiBadge source={source} />
+          </div>
           {triage.sellable ? (
             <div className="grid grid-cols-2 gap-3">
               <Tile label={t('triage.grade')} value={triage.grade} color="text-leaf-dark" />
