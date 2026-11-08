@@ -184,6 +184,11 @@ export default function Layout() {
             ]}
           />
         </div>
+        <div className="border-t border-jute-deep">
+          <p className="mx-auto max-w-6xl px-4 py-4 text-center text-xs text-soil-muted">
+            © {new Date().getFullYear()} {t('app.name')} · {t('footer.credit')}
+          </p>
+        </div>
       </footer>
 
       {/* Phone: a bottom tab bar, like the design. */}

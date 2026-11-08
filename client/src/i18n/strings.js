@@ -2,7 +2,8 @@
 export const strings = {
   bn: {
     'app.name': 'হাটলি',
-    'app.tagline': 'বাঁকা সবজি, সোজা হিসাব',
+    'app.tagline': 'তাজা ফসল, ন্যায্য দাম, কিছুই ফেলনা নয়',
+    'footer.credit': 'ডেভেলপ করেছেন Musfique Us Salehin',
     'nav.market': 'বাজার',
     'nav.orders': 'অর্ডার',
     'nav.impact': 'প্রভাব',
@@ -168,7 +169,8 @@ export const strings = {
   },
   en: {
     'app.name': 'Haatly',
-    'app.tagline': 'Bent vegetables, straight prices',
+    'app.tagline': 'Fresh harvest, fair prices, nothing wasted.',
+    'footer.credit': 'Developed by Musfique Us Salehin',
     'nav.market': 'Market',
     'nav.orders': 'Orders',
     'nav.impact': 'Impact',

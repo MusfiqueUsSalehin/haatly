@@ -39,7 +39,7 @@ const STEPS = [
 ];
 
 export default function Home() {
-  const { pick, money, lang } = useI18n();
+  const { t, pick, money, lang } = useI18n();
   const { city } = useCity();
   const boxes = useApi(city ? `/boxes?city=${city.code}` : null);
   const impact = useApi('/impact');
@@ -68,13 +68,10 @@ export default function Home() {
       <section className="grid items-start gap-10 py-6 lg:grid-cols-[1.05fr_1fr]">
         <div>
           <h1 className="font-display text-4xl leading-[1.12] md:text-6xl">
-            <span className="block text-soil">
-              {pick('দেখতে একটু বাঁকা।', 'A little bent to look at.')}
-            </span>
-            <span className="block text-leaf-dark">
-              {pick('খেতে পুরোপুরি ভালো।', 'Perfectly good to eat.')}
-            </span>
+            <span className="block text-soil">{pick('ফসল বাঁচান,', 'Save the harvest.')}</span>
+            <span className="block text-leaf-dark">{pick('টাকা বাঁচান।', 'Save your money.')}</span>
           </h1>
+          <p className="mt-3 text-lg font-semibold text-turmeric-deep">{t('app.tagline')}</p>
           <p className="mt-5 max-w-prose text-lg leading-relaxed text-soil-muted">
             {pick(
               'ক্ষেতে যে সবজি ফেলে দেওয়া হতো — আকারে অসমান, গায়ে দাগ — সেটাই সরাসরি আপনার দরজায়, কাঁচাবাজারের চেয়ে কমে।',
